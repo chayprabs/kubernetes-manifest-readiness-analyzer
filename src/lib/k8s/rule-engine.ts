@@ -8,7 +8,7 @@ import {
   sortFindings,
 } from "@/lib/k8s/findings";
 import { resolveAnalyzerOptions } from "@/lib/k8s/profiles";
-import { calculateReadinessScore } from "@/lib/k8s/scoring";
+import { buildReadinessScorecard } from "@/lib/k8s/scoring";
 import type {
   K8sAnalysisReport,
   K8sAnalyzerOptions,
@@ -90,11 +90,21 @@ export function runK8sRuleEngine({
     ),
   );
   const state = getReportState(raw, fatalParseErrors.length > 0);
+  const scorecard = buildReadinessScorecard({
+    findings,
+    parseResult,
+    relationshipGraph: filteredGraph,
+    profileId: profile.id,
+    state,
+  });
 
   return {
     ok: fatalParseErrors.length === 0,
     state,
     message: getReportMessage(state, findings.length),
+    headline: scorecard.headline,
+    summary: scorecard.summary,
+    nextSteps: scorecard.nextSteps,
     raw,
     options: resolvedOptions,
     profile,
@@ -102,11 +112,19 @@ export function runK8sRuleEngine({
     relationshipGraph: filteredGraph,
     findings,
     fatalParseErrors,
-    readinessScore: calculateReadinessScore(findings),
+    readinessScore: scorecard.readinessScore,
+    readinessGrade: scorecard.readinessGrade,
+    riskLevel: scorecard.riskLevel,
+    canShareReportSafely: scorecard.canShareReportSafely,
     categoryCounts: buildCategoryCounts(findings),
     severityCounts: buildSeverityCounts(findings),
     categorySummaries: buildCategorySummaries(findings),
+    categoryScores: scorecard.categoryScores,
     resourceCounts: buildResourceCounts(filteredGraph.resources),
+    resourceSummary: scorecard.resourceSummary,
+    fixFirstFindings: scorecard.fixFirstFindings,
+    positiveChecks: scorecard.positiveChecks,
+    scoreBreakdown: scorecard.scoreBreakdown,
   };
 }
 

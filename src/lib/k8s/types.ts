@@ -163,6 +163,48 @@ export type K8sFinding = {
   suggestion: string;
 };
 
+export type K8sScorecardCategory =
+  | "reliability"
+  | "security"
+  | "networking"
+  | "operations"
+  | "api-version";
+
+export type K8sReadinessGrade =
+  | "Production ready with minor notes"
+  | "Mostly ready, review warnings"
+  | "Needs production fixes"
+  | "High risk"
+  | "Not production ready";
+
+export type K8sRiskLevel = "low" | "moderate" | "high" | "critical";
+
+export type K8sPositiveCheck = {
+  id: string;
+  title: string;
+  summary: string;
+};
+
+export type K8sResourceSummary = {
+  totalObjects: number;
+  namespacesFound: string[];
+  workloadsFound: number;
+  servicesFound: number;
+  ingressesFound: number;
+  pdbsFound: number;
+  networkPoliciesFound: number;
+};
+
+export type K8sScoreBreakdown = {
+  startingScore: number;
+  deductions: number;
+  bonusPoints: number;
+  fatalPenalty: number;
+  deductionsByCategory: Record<K8sScorecardCategory, number>;
+  categoryCaps: Record<K8sScorecardCategory, number>;
+  profilePenaltyMultipliers: Record<K8sScorecardCategory, number>;
+};
+
 export type K8sAnalyzerProfileId =
   | "balanced"
   | "strict"
@@ -451,6 +493,9 @@ export type K8sAnalysisReport = {
   ok: boolean;
   state: "empty" | "invalid" | "ready";
   message: string;
+  headline: string;
+  summary: string;
+  nextSteps: string;
   raw: string;
   options: K8sResolvedAnalyzerOptions;
   profile: K8sAnalyzerProfile;
@@ -459,8 +504,16 @@ export type K8sAnalysisReport = {
   findings: K8sFinding[];
   fatalParseErrors: K8sParseError[];
   readinessScore: number;
+  readinessGrade: K8sReadinessGrade;
+  riskLevel: K8sRiskLevel;
+  canShareReportSafely: boolean;
   categoryCounts: Record<K8sFindingCategory, number>;
   severityCounts: Record<K8sFindingSeverity, number>;
   categorySummaries: Record<K8sFindingCategory, K8sCategorySummary>;
+  categoryScores: Record<K8sScorecardCategory, number>;
   resourceCounts: K8sResourceCounts;
+  resourceSummary: K8sResourceSummary;
+  fixFirstFindings: K8sFinding[];
+  positiveChecks: K8sPositiveCheck[];
+  scoreBreakdown: K8sScoreBreakdown;
 };

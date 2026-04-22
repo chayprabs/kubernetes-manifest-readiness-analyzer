@@ -29,12 +29,18 @@ export const findingCategories = [
   "best-practice",
 ] as const satisfies readonly K8sFindingCategory[];
 
-const severityRank: Record<K8sFindingSeverity, number> = {
+export const findingSeverityRanks: Record<K8sFindingSeverity, number> = {
   critical: 5,
   high: 4,
   medium: 3,
   low: 2,
   info: 1,
+};
+
+export const findingConfidenceWeights: Record<K8sFindingConfidence, number> = {
+  high: 1,
+  medium: 0.7,
+  low: 0.45,
 };
 
 const categoryRank = Object.fromEntries(
@@ -156,7 +162,7 @@ export function dedupeFindings(findings: K8sFinding[]) {
 export function sortFindings(findings: K8sFinding[]) {
   return [...findings].sort((left, right) => {
     const severityDelta =
-      severityRank[right.severity] - severityRank[left.severity];
+      findingSeverityRanks[right.severity] - findingSeverityRanks[left.severity];
 
     if (severityDelta !== 0) {
       return severityDelta;
@@ -221,7 +227,15 @@ export function compareFindingSeverity(
   left: K8sFindingSeverity,
   right: K8sFindingSeverity,
 ) {
-  return severityRank[left] - severityRank[right];
+  return findingSeverityRanks[left] - findingSeverityRanks[right];
+}
+
+export function getFindingSeverityRank(severity: K8sFindingSeverity) {
+  return findingSeverityRanks[severity];
+}
+
+export function getFindingConfidenceWeight(confidence: K8sFindingConfidence) {
+  return findingConfidenceWeights[confidence];
 }
 
 function compareStrings(left: string | undefined, right: string | undefined) {

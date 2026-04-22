@@ -1,11 +1,6 @@
-export const kubernetesVersions = [
-  "1.26",
-  "1.27",
-  "1.28",
-  "1.29",
-  "1.30",
-  "1.31",
-] as const;
+import { supportedKubernetesTargetVersions } from "@/lib/k8s/deprecations";
+
+export const kubernetesVersions = supportedKubernetesTargetVersions;
 
 export const manifestProfiles = [
   "Balanced",

@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Authos
 
-## Getting Started
+Authos is a browser-first developer-tools site. The first tool is a Kubernetes Manifest Production-Readiness Analyzer designed around local browser processing.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router with TypeScript
+- Tailwind CSS
+- ESLint and Prettier
+- Vitest for unit tests
+- Playwright for end-to-end tests
+- No backend database, auth implementation, or paid API dependency
+
+## Run Locally
+
+With `pnpm`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+With `npm`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000) after the dev server starts.
 
-## Learn More
+## Available Routes
 
-To learn more about Next.js, take a look at the following resources:
+- `/`
+- `/tools`
+- `/tools/kubernetes-manifest-analyzer`
+- `/privacy`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Useful Commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:e2e
+pnpm build
+```
 
-## Deploy on Vercel
+## Product Goal
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Build a clean technical foundation for a browser-first developer-tools site, starting with manifest analysis that can stay local to the user's browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- The Kubernetes analyzer foundation includes a typed rule registry and worker-ready analysis boundary.
+- End-to-end tests verify the primary public routes render without errors.
+"# kubernetes-manifest-readiness-analyzer" 

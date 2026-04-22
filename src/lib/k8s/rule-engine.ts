@@ -7,6 +7,7 @@ import {
   findingSeverities,
   sortFindings,
 } from "@/lib/k8s/findings";
+import { enrichK8sFixSuggestions } from "@/lib/k8s/fix-suggestions";
 import { resolveAnalyzerOptions } from "@/lib/k8s/profiles";
 import { buildReadinessScorecard } from "@/lib/k8s/scoring";
 import type {
@@ -66,27 +67,30 @@ export function runK8sRuleEngine({
   };
   const ruleFindings =
     fatalParseErrors.length > 0 ? [] : executeRulesSafely(rules, ruleContext);
-  const findings = sortFindings(
-    dedupeFindings(
-      [...schemaFindings, ...ruleFindings].filter((finding) => {
-        if (
-          !resolvedOptions.includeInfoFindings &&
-          finding.severity === "info"
-        ) {
-          return false;
-        }
+  const findings = enrichK8sFixSuggestions(
+    ruleContext,
+    sortFindings(
+      dedupeFindings(
+        [...schemaFindings, ...ruleFindings].filter((finding) => {
+          if (
+            !resolvedOptions.includeInfoFindings &&
+            finding.severity === "info"
+          ) {
+            return false;
+          }
 
-        const namespaceFilter = resolvedOptions.namespaceFilter;
+          const namespaceFilter = resolvedOptions.namespaceFilter;
 
-        if (!namespaceFilter) {
-          return true;
-        }
+          if (!namespaceFilter) {
+            return true;
+          }
 
-        return (
-          finding.resourceRef.namespace === undefined ||
-          finding.resourceRef.namespace === namespaceFilter
-        );
-      }),
+          return (
+            finding.resourceRef.namespace === undefined ||
+            finding.resourceRef.namespace === namespaceFilter
+          );
+        }),
+      ),
     ),
   );
   const state = getReportState(raw, fatalParseErrors.length > 0);

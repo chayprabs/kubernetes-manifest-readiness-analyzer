@@ -2,7 +2,7 @@ import { createFinding } from "@/lib/k8s/findings";
 import type {
   K8sFinding,
   K8sFindingLocation,
-  K8sFixSuggestion,
+  K8sFixSuggestionInput,
   K8sManifestDocument,
   K8sObjectRef,
   K8sRuleContext,
@@ -25,7 +25,7 @@ type CreateSecurityFindingInput = {
   category: K8sFinding["category"];
   whyItMatters: string;
   recommendation: string;
-  fix?: K8sFixSuggestion;
+  fix?: K8sFixSuggestionInput;
   confidence?: K8sFinding["confidence"];
   path?: string;
 };

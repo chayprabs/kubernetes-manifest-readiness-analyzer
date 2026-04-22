@@ -4,7 +4,7 @@ import type {
   K8sExtractedResource,
   K8sFinding,
   K8sFindingLocation,
-  K8sFixSuggestion,
+  K8sFixSuggestionInput,
   K8sManifestDocument,
   K8sRuleContext,
   K8sWorkloadResource,
@@ -19,7 +19,7 @@ type CreatePackFindingInput = {
   category: K8sFinding["category"];
   whyItMatters: string;
   recommendation: string;
-  fix?: K8sFixSuggestion;
+  fix?: K8sFixSuggestionInput;
   docsUrl?: string | undefined;
   confidence?: K8sFinding["confidence"];
   path?: string;

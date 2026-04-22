@@ -56,7 +56,7 @@ describe("Kubernetes reliability rules", () => {
       whyItMatters: expect.stringContaining("Service traffic"),
       recommendation: expect.stringContaining("adjust the path, port, and timing"),
       fix: {
-        summary: expect.stringContaining("readinessProbe"),
+        type: "yaml-snippet",
         snippet: expect.stringContaining("tcpSocket"),
       },
     });
@@ -244,13 +244,15 @@ describe("Kubernetes reliability rules", () => {
     expect(balanced[0]).toMatchObject({
       severity: "low",
       fix: {
-        snippet: "replicas: 2",
+        type: "strategic-merge-patch-like",
+        snippet: expect.stringContaining("replicas: 2"),
       },
     });
     expect(strict[0]).toMatchObject({
       severity: "medium",
       fix: {
-        snippet: "replicas: 3",
+        type: "strategic-merge-patch-like",
+        snippet: expect.stringContaining("replicas: 3"),
       },
     });
   });

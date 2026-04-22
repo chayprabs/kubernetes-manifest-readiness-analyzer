@@ -140,11 +140,83 @@ export type K8sFindingLocation = {
   source?: K8sSourceLocation | undefined;
 };
 
-export type K8sFixSuggestion = {
-  summary: string;
-  yamlPath?: string;
-  snippet?: string;
+export type K8sFixSuggestionType =
+  | "yaml-snippet"
+  | "strategic-merge-patch-like"
+  | "json-patch-like"
+  | "manual-instruction"
+  | "new-resource";
+
+export type K8sFixPreview = {
+  before?: string | undefined;
+  after?: string | undefined;
 };
+
+export type K8sJsonPatchLikeOperation = {
+  op: "add" | "remove" | "replace" | "move" | "copy" | "test";
+  path: string;
+  from?: string;
+  value?: unknown;
+};
+
+type K8sFixSuggestionBase = {
+  type: K8sFixSuggestionType;
+  title: string;
+  riskNote: string;
+  safeToAutoApply: boolean;
+  summary: string;
+  yamlPath?: string | undefined;
+  preview?: K8sFixPreview | undefined;
+  copyableContent?: string | undefined;
+  snippet?: string | undefined;
+};
+
+export type K8sYamlSnippetFixSuggestion = K8sFixSuggestionBase & {
+  type: "yaml-snippet";
+  copyableContent: string;
+};
+
+export type K8sStrategicMergePatchLikeFixSuggestion =
+  K8sFixSuggestionBase & {
+    type: "strategic-merge-patch-like";
+    targetRef: Pick<K8sObjectRef, "apiVersion" | "kind" | "name" | "namespace">;
+    copyableContent: string;
+  };
+
+export type K8sJsonPatchLikeFixSuggestion = K8sFixSuggestionBase & {
+  type: "json-patch-like";
+  targetRef: Pick<K8sObjectRef, "apiVersion" | "kind" | "name" | "namespace">;
+  operations: readonly K8sJsonPatchLikeOperation[];
+  copyableContent: string;
+};
+
+export type K8sManualInstructionFixSuggestion = K8sFixSuggestionBase & {
+  type: "manual-instruction";
+  instructions: string;
+};
+
+export type K8sNewResourceFixSuggestion = K8sFixSuggestionBase & {
+  type: "new-resource";
+  resourceKind: K8sResourceKind | undefined;
+  copyableContent: string;
+};
+
+export type K8sFixSuggestion =
+  | K8sYamlSnippetFixSuggestion
+  | K8sStrategicMergePatchLikeFixSuggestion
+  | K8sJsonPatchLikeFixSuggestion
+  | K8sManualInstructionFixSuggestion
+  | K8sNewResourceFixSuggestion;
+
+export type K8sLegacyFixSuggestion = {
+  summary: string;
+  yamlPath?: string | undefined;
+  snippet?: string | undefined;
+};
+
+export type K8sFixSuggestionInput =
+  | K8sFixSuggestion
+  | K8sLegacyFixSuggestion;
 
 export type K8sFinding = {
   id: string;

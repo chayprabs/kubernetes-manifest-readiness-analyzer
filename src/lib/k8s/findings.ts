@@ -2,12 +2,13 @@ import type {
   K8sFinding,
   K8sFindingCategory,
   K8sFindingConfidence,
+  K8sFixSuggestionInput,
   K8sFindingLocation,
   K8sFindingSeverity,
-  K8sFixSuggestion,
   K8sObjectRef,
   K8sParseError,
 } from "@/lib/k8s/types";
+import { normalizeK8sFixSuggestion } from "@/lib/k8s/fix-suggestions";
 
 export const findingSeverities = [
   "critical",
@@ -58,7 +59,7 @@ type CreateFindingInput = {
   location?: K8sFindingLocation | undefined;
   whyItMatters: string;
   recommendation: string;
-  fix?: K8sFixSuggestion | undefined;
+  fix?: K8sFixSuggestionInput | undefined;
   docsUrl?: string | undefined;
   confidence?: K8sFindingConfidence;
 };
@@ -89,7 +90,7 @@ export function createFinding({
     location,
     whyItMatters,
     recommendation,
-    fix,
+    fix: normalizeK8sFixSuggestion(fix),
     docsUrl,
     confidence,
     suggestion: recommendation,

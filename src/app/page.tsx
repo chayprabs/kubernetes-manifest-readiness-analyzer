@@ -1,65 +1,136 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Container } from "@/components/layout/container";
+import { getFeaturedTools } from "@/lib/tools/registry";
+import { ToolCard } from "@/components/tool/tool-card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { homeMetadata, siteConfig } from "@/lib/site";
+
+const featuredTools = getFeaturedTools(3);
+const [primaryTool] = featuredTools;
+
+export const metadata: Metadata = homeMetadata;
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <Container size="page" className="flex flex-col gap-16 pb-8">
+      <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <Card>
+          <CardHeader className="gap-5">
+            <Badge variant="info">Design system foundation</Badge>
+            <div className="space-y-4">
+              <CardTitle className="max-w-3xl text-4xl sm:text-5xl">
+                Authos is building serious browser-first tooling for engineering
+                teams.
+              </CardTitle>
+              <CardDescription className="max-w-2xl text-lg">
+                The first release focuses on Kubernetes manifest review so teams
+                can inspect production-readiness, runtime safety, and deployment
+                hygiene inside a fast, bookmarkable workspace.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4 sm:flex-row">
+            <Button asChild>
+              <Link href="/tools">Explore tools</Link>
+            </Button>
+            {primaryTool ? (
+              <Button asChild variant="outline">
+                <Link href={primaryTool.slug}>
+                  Open {primaryTool.shortName}
+                </Link>
+              </Button>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-background-muted/70">
+          <CardHeader className="gap-3">
+            <p className="text-muted font-mono text-xs tracking-[0.24em] uppercase">
+              First registered tool
+            </p>
+            <CardTitle>{primaryTool?.name}</CardTitle>
+            <CardDescription>{primaryTool?.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <div className="border-border bg-card rounded-2xl border p-4">
+              <p className="text-muted font-mono text-xs tracking-[0.18em] uppercase">
+                Category
+              </p>
+              <p className="text-foreground mt-2 text-sm">
+                {primaryTool?.category}
+              </p>
+            </div>
+            <div className="border-border bg-card rounded-2xl border p-4">
+              <p className="text-muted font-mono text-xs tracking-[0.18em] uppercase">
+                Status
+              </p>
+              <p className="text-foreground mt-2 text-sm">
+                {primaryTool?.status}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-8">
+        <SectionHeading
+          eyebrow="Launch focus"
+          title={siteConfig.mission}
+          description="The shell, registry, metadata, and primitives are designed so new tools can arrive without rewriting the overall site."
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Registry-driven structure</CardTitle>
+              <CardDescription>
+                Tool definitions now live in one place so catalog pages, nav,
+                and metadata can scale cleanly as Authos grows.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Browser-first workflows</CardTitle>
+              <CardDescription>
+                Core tools are framed for local processing whenever possible,
+                keeping sensitive engineering inputs closer to the developer.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Neutral design system</CardTitle>
+              <CardDescription>
+                The interface is intentionally compact, trustworthy, and easy to
+                redesign once the final brand is locked.
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="space-y-8">
+        <SectionHeading
+          eyebrow="Featured tools"
+          title="Registered tools from the Authos catalog"
+          description="This section is powered by the registry, so future tools can appear here and on the catalog page from the same source of truth."
+        />
+        <div className="grid gap-6">
+          {featuredTools.map((tool) => (
+            <ToolCard key={tool.id} tool={tool} />
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+    </Container>
   );
 }

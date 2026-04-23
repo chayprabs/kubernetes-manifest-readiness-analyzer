@@ -1,6 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { K8sFinding } from "@/lib/k8s/types";
 import {
@@ -22,12 +24,14 @@ type FixSuggestionCardProps = {
   finding: K8sFinding;
   compact?: boolean;
   showFindingContext?: boolean;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
 export function FixSuggestionCard({
   finding,
   compact = false,
   showFindingContext = false,
+  analyticsPayload,
 }: FixSuggestionCardProps) {
   const fix = finding.fix;
   const [snippetExpanded, setSnippetExpanded] = useState(!compact);
@@ -103,6 +107,9 @@ export function FixSuggestionCard({
             copiedLabel="Copied"
             showText
             showInlineFeedback
+            onCopySuccess={() =>
+              trackAnalyticsEvent("fix_copied", analyticsPayload)
+            }
           />
           <p className="text-muted text-xs leading-5">
             {copyableSnippet

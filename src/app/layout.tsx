@@ -47,6 +47,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full`}
     >
       <body className="bg-background text-foreground min-h-full">

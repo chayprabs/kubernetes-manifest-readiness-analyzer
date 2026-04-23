@@ -1,3 +1,6 @@
+export const kubernetesManifestAnalyzerToolId =
+  "kubernetes-manifest-analyzer";
+
 export const kubernetesManifestAnalyzerPath =
   "/tools/kubernetes-manifest-analyzer";
 

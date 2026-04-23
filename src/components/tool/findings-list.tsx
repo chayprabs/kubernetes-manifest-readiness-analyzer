@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
 import { EmptyState } from "@/components/tool/empty-state";
 import { FindingCard } from "@/components/tool/finding-card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ type FindingsListProps = {
   emptyTitle: string;
   emptyDescription: string;
   initialVisibleCount?: number;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
 const LARGE_FINDINGS_THRESHOLD = 200;
@@ -26,6 +28,7 @@ export function FindingsList({
   emptyTitle,
   emptyDescription,
   initialVisibleCount = 12,
+  analyticsPayload,
 }: FindingsListProps) {
   const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
   const [pageIndex, setPageIndex] = useState(0);
@@ -109,7 +112,12 @@ export function FindingsList({
 
       <div className="grid gap-4">
         {visibleFindings.map((finding) => (
-          <FindingCard key={finding.id} finding={finding} compact={compact} />
+          <FindingCard
+            key={finding.id}
+            finding={finding}
+            compact={compact}
+            analyticsPayload={analyticsPayload}
+          />
         ))}
       </div>
     </div>

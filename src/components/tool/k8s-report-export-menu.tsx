@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { ChevronDown } from "lucide-react";
 import type { K8sAnalysisReport } from "@/lib/k8s/types";
 import {
@@ -31,11 +33,13 @@ import {
 type K8sReportExportMenuProps = {
   report: K8sAnalysisReport | null;
   redactVisibleOutput: boolean;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
 export function K8sReportExportMenu({
   report,
   redactVisibleOutput,
+  analyticsPayload,
 }: K8sReportExportMenuProps) {
   const [rawManifestDialogOpen, setRawManifestDialogOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -66,6 +70,7 @@ export function K8sReportExportMenu({
         }),
       );
       setStatusMessage("Markdown report copied.");
+      trackAnalyticsEvent("report_copied", analyticsPayload);
     } catch {
       setStatusMessage("Clipboard access failed. Try a download instead.");
     }
@@ -86,6 +91,7 @@ export function K8sReportExportMenu({
       "text/markdown;charset=utf-8",
     );
     setStatusMessage("Markdown report downloaded.");
+    trackAnalyticsEvent("report_downloaded", analyticsPayload);
   }
 
   function handleDownloadJson() {
@@ -103,6 +109,7 @@ export function K8sReportExportMenu({
       "application/json;charset=utf-8",
     );
     setStatusMessage("JSON report downloaded.");
+    trackAnalyticsEvent("report_downloaded", analyticsPayload);
   }
 
   function handleDownloadJsonWithManifest() {
@@ -126,6 +133,7 @@ export function K8sReportExportMenu({
         ? "Redacted manifest report downloaded."
         : "Manifest-inclusive JSON downloaded. Review before sharing.",
     );
+    trackAnalyticsEvent("report_downloaded", analyticsPayload);
   }
 
   function handleDownloadCsv() {
@@ -143,12 +151,19 @@ export function K8sReportExportMenu({
       "text/csv;charset=utf-8",
     );
     setStatusMessage("CSV findings report downloaded.");
+    trackAnalyticsEvent("report_downloaded", analyticsPayload);
   }
 
   return (
     <>
       <div className="grid gap-2">
-        <DropdownMenu>
+        <DropdownMenu
+          onOpenChange={(open) => {
+            if (open) {
+              trackAnalyticsEvent("export_opened", analyticsPayload);
+            }
+          }}
+        >
           <DropdownMenuTrigger asChild>
             <Button
               type="button"

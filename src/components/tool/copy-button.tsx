@@ -22,6 +22,8 @@ type CopyButtonProps = {
   showInlineFeedback?: boolean;
   size?: ButtonProps["size"];
   variant?: ButtonProps["variant"];
+  onCopySuccess?: (() => void) | undefined;
+  onCopyError?: (() => void) | undefined;
 };
 
 type CopyState = "idle" | "copied" | "error";
@@ -37,6 +39,8 @@ export function CopyButton({
   showInlineFeedback = false,
   size,
   variant,
+  onCopySuccess,
+  onCopyError,
 }: CopyButtonProps) {
   const [state, setState] = useState<CopyState>("idle");
   const timeoutRef = useRef<number | null>(null);
@@ -57,8 +61,10 @@ export function CopyButton({
     try {
       await navigator.clipboard.writeText(value);
       setState("copied");
+      onCopySuccess?.();
     } catch {
       setState("error");
+      onCopyError?.();
     }
 
     timeoutRef.current = window.setTimeout(() => {

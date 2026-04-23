@@ -1,4 +1,7 @@
-import { getFindingConfidenceWeight, getFindingSeverityRank } from "@/lib/k8s/findings";
+import {
+  getFindingConfidenceWeight,
+  getFindingSeverityRank,
+} from "@/lib/k8s/findings";
 import { clamp } from "@/lib/utils";
 import type {
   K8sAnalysisReport,
@@ -13,7 +16,6 @@ import type {
   K8sRelationshipGraph,
   K8sResourceSummary,
   K8sRiskLevel,
-  K8sScoreBreakdown,
   K8sScorecardCategory,
   K8sWorkloadKind,
   K8sWorkloadResource,
@@ -162,7 +164,10 @@ export function buildReadinessScorecard({
   );
   const bonusPoints = Math.min(
     8,
-    positiveChecks.reduce((total, check) => total + getPositiveCheckBonus(check.id), 0),
+    positiveChecks.reduce(
+      (total, check) => total + getPositiveCheckBonus(check.id),
+      0,
+    ),
   );
   const breakdown = calculateDeductionBreakdown(findings, profileId);
   const fatalPenalty = getFatalPenalty(parseResult);
@@ -266,15 +271,19 @@ function calculateDeductionBreakdown(
       const categoryFindings = findings
         .filter(
           (finding) =>
-            mapFindingCategoryToScorecardCategory(finding.category) === category,
+            mapFindingCategoryToScorecardCategory(finding.category) ===
+            category,
         )
         .map((finding) => calculateWeightedPenalty(finding, profileId))
         .filter((penalty) => penalty > 0)
         .sort((left, right) => right - left);
 
-      const categoryDeduction = categoryFindings.reduce((total, penalty, index) => {
-        return total + penalty * getDeductionDiminishingFactor(index);
-      }, 0);
+      const categoryDeduction = categoryFindings.reduce(
+        (total, penalty, index) => {
+          return total + penalty * getDeductionDiminishingFactor(index);
+        },
+        0,
+      );
 
       result[category] = roundScore(
         Math.min(readinessScoreCategoryCaps[category], categoryDeduction),
@@ -288,7 +297,10 @@ function calculateDeductionBreakdown(
   return {
     deductionsByCategory,
     deductions: roundScore(
-      Object.values(deductionsByCategory).reduce((total, value) => total + value, 0),
+      Object.values(deductionsByCategory).reduce(
+        (total, value) => total + value,
+        0,
+      ),
     ),
   };
 }
@@ -306,7 +318,8 @@ function calculateWeightedPenalty(
   const scorecardCategory = mapFindingCategoryToScorecardCategory(
     finding.category,
   );
-  const profileMultiplier = profilePenaltyMultipliers[profileId][scorecardCategory];
+  const profileMultiplier =
+    profilePenaltyMultipliers[profileId][scorecardCategory];
 
   return (
     basePenalty *
@@ -355,11 +368,7 @@ function buildCategoryScores(
     (scores, category) => {
       const cap = readinessScoreCategoryCaps[category];
       const deduction = deductionsByCategory[category];
-      const score = clamp(
-        Math.round(((cap - deduction) / cap) * 100),
-        0,
-        100,
-      );
+      const score = clamp(Math.round(((cap - deduction) / cap) * 100), 0, 100);
 
       scores[category] = score;
       return scores;
@@ -401,17 +410,11 @@ function getRiskLevel(
     return "critical";
   }
 
-  if (
-    findings.some((finding) => finding.severity === "high") ||
-    score < 60
-  ) {
+  if (findings.some((finding) => finding.severity === "high") || score < 60) {
     return "high";
   }
 
-  if (
-    findings.some((finding) => finding.severity === "medium") ||
-    score < 75
-  ) {
+  if (findings.some((finding) => finding.severity === "medium") || score < 75) {
     return "moderate";
   }
 
@@ -469,12 +472,10 @@ function buildSummary(
   }
 
   const blockingCount = findings.filter(
-    (finding) =>
-      finding.severity === "critical" || finding.severity === "high",
+    (finding) => finding.severity === "critical" || finding.severity === "high",
   ).length;
   const warningCount = findings.filter(
-    (finding) =>
-      finding.severity === "medium" || finding.severity === "low",
+    (finding) => finding.severity === "medium" || finding.severity === "low",
   ).length;
   const positiveSummary =
     positiveChecks.length > 0
@@ -508,7 +509,9 @@ function buildNextSteps(
 
   return `Fix first: ${fixFirstFindings
     .map((finding) => finding.title)
-    .join("; ")}. After those are resolved, review the lower-severity findings before shipping.`;
+    .join(
+      "; ",
+    )}. After those are resolved, review the lower-severity findings before shipping.`;
 }
 
 function selectFixFirstFindings(
@@ -573,7 +576,9 @@ function buildPositiveChecks(
 
   if (
     workloadContainers.length > 0 &&
-    workloadContainers.every((container) => hasRecommendedResources(container.record))
+    workloadContainers.every((container) =>
+      hasRecommendedResources(container.record),
+    )
   ) {
     checks.push({
       id: "resources-configured",
@@ -594,7 +599,9 @@ function buildPositiveChecks(
 
   if (
     productionStyleContainers.length > 0 &&
-    findings.every((finding) => !securityHardeningRuleIds.has(finding.ruleId)) &&
+    findings.every(
+      (finding) => !securityHardeningRuleIds.has(finding.ruleId),
+    ) &&
     productionStyleContainers.every((container) =>
       hasHardenedSecurityContext(container.workload, container),
     )
@@ -644,7 +651,9 @@ function hasPdbCoverage(
   }
 
   if (
-    findings.some((finding) => finding.ruleId === "missing-pod-disruption-budget")
+    findings.some(
+      (finding) => finding.ruleId === "missing-pod-disruption-budget",
+    )
   ) {
     return false;
   }
@@ -662,7 +671,9 @@ function getReplicaCount(
   documents: K8sManifestDocument[],
   workload: K8sWorkloadResource,
 ) {
-  const document = documents.find((entry) => entry.index === workload.documentIndex);
+  const document = documents.find(
+    (entry) => entry.index === workload.documentIndex,
+  );
   const replicas = asNumber(isRecord(document?.raw.spec)?.replicas);
 
   return replicas ?? 1;
@@ -709,7 +720,9 @@ function hasHardenedSecurityContext(
   workload: K8sWorkloadResource,
   container: WorkloadContainer,
 ) {
-  const podSecurityContext = isRecord(workload.podTemplate.spec.securityContext);
+  const podSecurityContext = isRecord(
+    workload.podTemplate.spec.securityContext,
+  );
   const containerSecurityContext = isRecord(container.record.securityContext);
   const capabilities = isRecord(containerSecurityContext?.capabilities);
   const droppedCapabilities = asStringArray(capabilities?.drop).map((value) =>
@@ -721,8 +734,11 @@ function hasHardenedSecurityContext(
   const seccompType = asNonEmptyString(seccompProfile?.type);
 
   return (
-    getEffectiveBoolean(containerSecurityContext, podSecurityContext, "runAsNonRoot") ===
-      true &&
+    getEffectiveBoolean(
+      containerSecurityContext,
+      podSecurityContext,
+      "runAsNonRoot",
+    ) === true &&
     getEffectiveBoolean(
       containerSecurityContext,
       undefined,

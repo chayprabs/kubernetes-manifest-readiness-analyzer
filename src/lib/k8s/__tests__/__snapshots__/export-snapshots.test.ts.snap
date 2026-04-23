@@ -1,0 +1,786 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Kubernetes export snapshots > keeps CSV findings stable for the deprecated-api sample 1`] = `
+""severity","category","resource","title","recommendation"
+"high","api-version","PodSecurityPolicy/legacy-psp","Deprecated or removed API version","PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook."
+"high","api-version","PodSecurityPolicy/legacy-psp","PodSecurityPolicy is removed","Migrate to Pod Security Admission or a reviewed third-party admission webhook before relying on this policy in newer clusters."
+"high","api-version","CronJob/nightly-legacy-sync (legacy)","Deprecated or removed API version","Update this manifest to a served API version before relying on a cluster upgrade. Migrate to batch/v1, available since v1.21."
+"high","api-version","Ingress/legacy-web (legacy)","Deprecated or removed API version","Ingress v1 renames backend fields and requires pathType on each path. Migrate to networking.k8s.io/v1, available since v1.19."
+"high","api-version","PodDisruptionBudget/legacy-web-pdb (legacy)","Deprecated or removed API version","policy/v1 changes empty selector behavior: {} selects all pods in the namespace. Migrate to policy/v1, available since v1.21."
+"medium","reliability","CronJob/nightly-legacy-sync (legacy)","Missing resource limits","Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned."
+"medium","reliability","CronJob/nightly-legacy-sync (legacy)","Missing resource requests","Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value."
+"medium","security","CronJob/nightly-legacy-sync (legacy)","Missing seccomp profile","Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile."
+"medium","security","CronJob/nightly-legacy-sync (legacy)","runAsNonRoot should be true","Set runAsNonRoot: true at pod level when possible so every container inherits the safer default."
+"medium","networking","Ingress/legacy-web (legacy)","Ingress does not configure TLS","Add a TLS block for the intended hosts and bind it to the certificate secret your ingress controller should use."
+"medium","best-practice","Ingress/legacy-web (legacy)","Missing recommended app labels","Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager."
+"low","security","CronJob/nightly-legacy-sync (legacy)","allowPrivilegeEscalation should be false","Set allowPrivilegeEscalation: false unless the application has a reviewed need for it."
+"low","security","CronJob/nightly-legacy-sync (legacy)","Capabilities should drop ALL by default","Start from capabilities.drop: [""ALL""] and then add back only the minimum reviewed capabilities if the app truly requires them."
+"low","security","CronJob/nightly-legacy-sync (legacy)","Container may run as root by default","Set runAsNonRoot: true explicitly and, when needed, choose a reviewed non-zero UID for the container."
+"low","security","CronJob/nightly-legacy-sync (legacy)","readOnlyRootFilesystem should be true","Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories."
+"low","operations","Ingress/legacy-web (legacy)","Missing owner or team metadata","Add a team label and owner annotation that match how your organization routes operational responsibility."
+"low","operations","Service/legacy-web (legacy)","Missing owner or team metadata","Add a team label and owner annotation that match how your organization routes operational responsibility."
+"low","best-practice","Service/legacy-web (legacy)","Missing recommended app labels","Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager.""
+`;
+
+exports[`Kubernetes export snapshots > keeps JSON export redaction stable for the secret fixture 1`] = `
+{
+  "exportMetadata": {
+    "generatedAt": "2026-04-23 02:30:00 UTC",
+    "generatedLocallyInBrowser": true,
+    "includesRawInput": true,
+    "privacyWarning": "This manifest bundle includes 4 sensitive signals across sensitive annotations, literal sensitive env vars, internal hostnames. Visible JSON and exports stay redacted by default.",
+    "redactedByDefault": true,
+    "reviewType": "static-manifest-review",
+  },
+  "report": {
+    "analysisMetadata": {
+      "analyzeMs": "<timing>",
+      "documentCount": 2,
+      "inputBytes": 1093,
+      "parseMs": "<timing>",
+      "totalMs": "<timing>",
+    },
+    "canShareReportSafely": false,
+    "findings": [
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+
+# TCP alternative: use this only if accepting a socket is a meaningful health signal for the workload.
+readinessProbe:
+  tcpSocket:
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+          "title": "Add a readiness probe template",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not define a readinessProbe.",
+        "recommendation": "Add a readinessProbe for this container. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+        "ruleId": "missing-readiness-probe",
+        "severity": "high",
+        "title": "Missing readiness probe",
+      },
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1",
+          "title": "Keep zero planned unavailability during rollout and add replica headroom.",
+          "type": "yaml-snippet",
+        },
+        "message": "Deployment "payments-api" rolls only 1 replica, so a rollout has no spare serving capacity if the replacement pod starts slowly or fails readiness.",
+        "recommendation": "Increase replicas to at least 2 and keep maxUnavailable at 0 for small Deployments that need to stay online during rollouts.",
+        "ruleId": "deployment-max-unavailable-risk",
+        "severity": "medium",
+        "title": "Deployment rollout availability risk",
+      },
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+livenessProbe:
+  httpGet:
+    path: /livez
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+
+# TCP alternative: use this only if accepting a socket is a meaningful health signal for the workload.
+livenessProbe:
+  tcpSocket:
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+          "title": "Add a liveness probe template",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not define a livenessProbe.",
+        "recommendation": "Add a livenessProbe that reflects real stuck-process behavior. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+        "ruleId": "missing-liveness-probe",
+        "severity": "medium",
+        "title": "Missing liveness probe",
+      },
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+          "title": "Add resource requests and limits",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" is missing both memory and CPU limits.",
+        "recommendation": "Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned.",
+        "ruleId": "missing-resource-limits",
+        "severity": "medium",
+        "title": "Missing resource limits",
+      },
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+          "title": "Add resource requests and limits",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" is missing cpu and memory requests.",
+        "recommendation": "Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value.",
+        "ruleId": "missing-resource-requests",
+        "severity": "medium",
+        "title": "Missing resource requests",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not set a seccomp profile.",
+        "recommendation": "Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.",
+        "ruleId": "missing-seccomp-profile",
+        "severity": "medium",
+        "title": "Missing seccomp profile",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not set runAsNonRoot: true at the pod or container level.",
+        "recommendation": "Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.",
+        "ruleId": "run-as-non-root",
+        "severity": "medium",
+        "title": "runAsNonRoot should be true",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Template only: create or reference a Secret separately. The original literal value is intentionally not repeated here.
+env:
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: app-secrets
+        key: DATABASE_PASSWORD",
+          "title": "Reference a Secret for DATABASE_PASSWORD",
+          "type": "yaml-snippet",
+        },
+        "message": "Environment variable "DATABASE_PASSWORD" on container "api" in Deployment "payments-api" uses a literal value instead of valueFrom.secretKeyRef.",
+        "recommendation": "Move this value into a Secret and reference it with valueFrom.secretKeyRef so the manifest does not carry the raw secret.",
+        "ruleId": "literal-sensitive-env-var",
+        "severity": "medium",
+        "title": "Sensitive environment variable uses a literal value",
+      },
+      {
+        "category": "security",
+        "fix": undefined,
+        "message": "Secret "payments-secrets" includes 2 literal entries under data or stringData. This analyzer intentionally does not display secret values.",
+        "recommendation": "Treat Secret manifests as sensitive input, keep values redacted in shared reports, and prefer secret delivery flows that avoid copying raw values around.",
+        "ruleId": "literal-secret-values",
+        "severity": "medium",
+        "title": "Secret contains literal values",
+      },
+      {
+        "category": "reliability",
+        "fix": {
+          "copyableContent": "# Patch-like example: confirm capacity, autoscaling behavior, and disruption budgets before scaling to 2 replicas.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: production
+spec:
+  replicas: 2",
+          "title": "Scale the Deployment to 2 replicas",
+          "type": "strategic-merge-patch-like",
+        },
+        "message": "Deployment "payments-api" is configured with 1 replica.",
+        "recommendation": "Set this Deployment to at least 2 replicas for production-style availability, then confirm the workload and dependencies can support the extra copies.",
+        "ruleId": "single-replica-deployment",
+        "severity": "low",
+        "title": "Single replica Deployment",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not set allowPrivilegeEscalation: false.",
+        "recommendation": "Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.",
+        "ruleId": "allow-privilege-escalation",
+        "severity": "low",
+        "title": "allowPrivilegeEscalation should be false",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "automountServiceAccountToken: false",
+          "title": "Disable automatic service account token mounting for app workloads that do not need cluster API access.",
+          "type": "yaml-snippet",
+        },
+        "message": "Deployment "payments-api" does not set automountServiceAccountToken: false.",
+        "recommendation": "Set automountServiceAccountToken: false unless the workload has a reviewed reason to call the Kubernetes API.",
+        "ruleId": "automount-service-account-token",
+        "severity": "low",
+        "title": "automountServiceAccountToken should usually be false",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not drop all capabilities before adding exceptions.",
+        "recommendation": "Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.",
+        "ruleId": "capabilities-not-dropping-all",
+        "severity": "low",
+        "title": "Capabilities should drop ALL by default",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not set runAsNonRoot or runAsUser, so the image could still start as root by default.",
+        "recommendation": "Set runAsNonRoot: true explicitly and, when needed, choose a reviewed non-zero UID for the container.",
+        "ruleId": "container-may-run-as-root-by-default",
+        "severity": "low",
+        "title": "Container may run as root by default",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "serviceAccountName: app-sa
+automountServiceAccountToken: false",
+          "title": "Move the workload off the default ServiceAccount and disable token mounting if the API is unnecessary.",
+          "type": "yaml-snippet",
+        },
+        "message": "Deployment "payments-api" uses the default ServiceAccount with its token mount still enabled.",
+        "recommendation": "Use a dedicated ServiceAccount for workloads that need cluster API access, and disable token mounting when they do not.",
+        "ruleId": "default-serviceaccount-usage",
+        "severity": "low",
+        "title": "Production workload uses the default ServiceAccount",
+      },
+      {
+        "category": "security",
+        "fix": {
+          "copyableContent": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault",
+          "title": "Add a reviewed securityContext baseline",
+          "type": "yaml-snippet",
+        },
+        "message": "Container "api" in Deployment "payments-api" does not set readOnlyRootFilesystem: true.",
+        "recommendation": "Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories.",
+        "ruleId": "read-only-root-filesystem",
+        "severity": "low",
+        "title": "readOnlyRootFilesystem should be true",
+      },
+      {
+        "category": "networking",
+        "fix": {
+          "copyableContent": "apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress: []
+# Careful rollout item: add explicit allow policies before enforcing this in production.",
+          "title": "Start with a minimal default-deny policy and stage explicit allow rules carefully.",
+          "type": "yaml-snippet",
+        },
+        "message": "Namespace "production" has application workloads but no NetworkPolicy resources in the manifest set.",
+        "recommendation": "Add at least a reviewed baseline NetworkPolicy for this namespace. A default-deny policy is a careful rollout item that usually needs explicit allow rules alongside it.",
+        "ruleId": "networkpolicy-absent-for-namespace",
+        "severity": "low",
+        "title": "Namespace has no NetworkPolicy",
+      },
+      {
+        "category": "operations",
+        "fix": {
+          "copyableContent": "metadata:
+  labels:
+    team: platform-team
+  annotations:
+    owner: platform-team",
+          "title": "Attach simple owner/team metadata so responders can find the responsible team quickly.",
+          "type": "yaml-snippet",
+        },
+        "message": "Deployment "payments-api" does not include obvious owner or team labels/annotations.",
+        "recommendation": "Add a team label and owner annotation that match how your organization routes operational responsibility.",
+        "ruleId": "missing-owner-team-annotations",
+        "severity": "low",
+        "title": "Missing owner or team metadata",
+      },
+      {
+        "category": "best-practice",
+        "fix": {
+          "copyableContent": "metadata:
+  labels:
+    app.kubernetes.io/name: payments-api
+    app.kubernetes.io/instance: payments-api
+    app.kubernetes.io/component: api # adjust to web, worker, db, etc.
+    app.kubernetes.io/part-of: platform-name
+    app.kubernetes.io/managed-by: gitops-or-helm",
+          "title": "Add the recommended app.kubernetes.io labels with real values for this resource.",
+          "type": "yaml-snippet",
+        },
+        "message": "Deployment "payments-api" is missing recommended app labels: app.kubernetes.io/component, app.kubernetes.io/part-of, app.kubernetes.io/managed-by.",
+        "recommendation": "Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager.",
+        "ruleId": "missing-recommended-app-labels",
+        "severity": "low",
+        "title": "Missing recommended app labels",
+      },
+    ],
+    "headline": "Not production ready: high-risk issues need review",
+    "parseResult": {
+      "documents": [
+        {
+          "apiVersion": "v1",
+          "index": 0,
+          "kind": "Secret",
+          "metadata": {
+            "name": "payments-secrets",
+            "namespace": "production",
+          },
+        },
+        {
+          "apiVersion": "apps/v1",
+          "index": 1,
+          "kind": "Deployment",
+          "metadata": {
+            "name": "payments-api",
+            "namespace": "production",
+          },
+        },
+      ],
+      "emptyDocuments": [],
+      "errorCount": 0,
+      "errors": [],
+      "input": {
+        "documentCount": 2,
+        "emptyDocumentCount": 0,
+        "raw": "apiVersion: v1
+kind: Secret
+metadata:
+  name: payments-secrets
+  namespace: production
+  annotations:
+    example.com/database-password: [REDACTED ANNOTATION]
+type: Opaque
+data:
+  password: [REDACTED SECRET]
+stringData:
+  api-token: [REDACTED SECRET]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: production
+  labels:
+    app.kubernetes.io/name: payments-api
+    app.kubernetes.io/instance: payments-prod
+  annotations:
+    example.com/private-key: [REDACTED ANNOTATION]
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: payments-api
+      app.kubernetes.io/instance: payments-prod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: payments-api
+        app.kubernetes.io/instance: payments-prod
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/example/payments-api:1.0.0
+          env:
+            - name: DATABASE_PASSWORD
+              value: [REDACTED ENV VALUE]
+            - name: INTERNAL_API_ENDPOINT
+              value: "[REDACTED INTERNAL HOST]"",
+        "recommendedMaxBytes": 2097152,
+        "sizeBytes": 1093,
+      },
+      "ok": true,
+      "warningCount": 0,
+      "warnings": [],
+    },
+    "privacy": {
+      "detectedKinds": [
+        "sensitive-annotation",
+        "sensitive-env-var",
+        "internal-hostname",
+      ],
+      "sensitiveDataDetected": true,
+      "signalCount": 4,
+      "signals": [
+        {
+          "documentIndex": 0,
+          "fieldPath": "metadata.annotations.example.com/database-password",
+          "keyName": "example.com/database-password",
+          "kind": "sensitive-annotation",
+          "resourceRef": {
+            "apiVersion": "v1",
+            "documentIndex": 0,
+            "kind": "Secret",
+            "name": "payments-secrets",
+            "namespace": "production",
+          },
+          "summary": "Annotation "example.com/database-password" looks sensitive and should stay redacted.",
+        },
+        {
+          "documentIndex": 1,
+          "fieldPath": "metadata.annotations.example.com/private-key",
+          "keyName": "example.com/private-key",
+          "kind": "sensitive-annotation",
+          "resourceRef": {
+            "apiVersion": "apps/v1",
+            "documentIndex": 1,
+            "kind": "Deployment",
+            "name": "payments-api",
+            "namespace": "production",
+          },
+          "summary": "Annotation "example.com/private-key" looks sensitive and should stay redacted.",
+        },
+        {
+          "documentIndex": 1,
+          "fieldPath": "spec.template.spec.containers.0.env.0.value",
+          "keyName": "DATABASE_PASSWORD",
+          "kind": "sensitive-env-var",
+          "resourceRef": {
+            "apiVersion": "apps/v1",
+            "documentIndex": 1,
+            "kind": "Deployment",
+            "name": "payments-api",
+            "namespace": "production",
+          },
+          "summary": "Environment variable "DATABASE_PASSWORD" uses a literal value and should stay redacted.",
+        },
+        {
+          "documentIndex": 1,
+          "fieldPath": "spec.template.spec.containers.0.env.1.value",
+          "keyName": "value",
+          "kind": "internal-hostname",
+          "resourceRef": {
+            "apiVersion": "apps/v1",
+            "documentIndex": 1,
+            "kind": "Deployment",
+            "name": "payments-api",
+            "namespace": "production",
+          },
+          "summary": "An internal hostname or service name was detected in the manifest.",
+        },
+      ],
+      "warningText": "This manifest bundle includes 4 sensitive signals across sensitive annotations, literal sensitive env vars, internal hostnames. Visible JSON and exports stay redacted by default.",
+      "warningTitle": "Sensitive data detected",
+    },
+    "rawInput": "apiVersion: v1
+kind: Secret
+metadata:
+  name: payments-secrets
+  namespace: production
+  annotations:
+    example.com/database-password: [REDACTED ANNOTATION]
+type: Opaque
+data:
+  password: [REDACTED SECRET]
+stringData:
+  api-token: [REDACTED SECRET]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: production
+  labels:
+    app.kubernetes.io/name: payments-api
+    app.kubernetes.io/instance: payments-prod
+  annotations:
+    example.com/private-key: [REDACTED ANNOTATION]
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: payments-api
+      app.kubernetes.io/instance: payments-prod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: payments-api
+        app.kubernetes.io/instance: payments-prod
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/example/payments-api:1.0.0
+          env:
+            - name: DATABASE_PASSWORD
+              value: [REDACTED ENV VALUE]
+            - name: INTERNAL_API_ENDPOINT
+              value: "[REDACTED INTERNAL HOST]"",
+    "summary": "Score 33/100 after reviewing 2 objects across 1 namespace. 1 blocking issue and 18 additional warnings were found.",
+  },
+}
+`;
+
+exports[`Kubernetes export snapshots > keeps the Markdown export stable for the broken production sample 1`] = `
+"# Kubernetes Manifest Review
+
+Generated locally in browser on 2026-04-23 02:30:00 UTC.
+Static manifest review only. This is not a live cluster audit.
+
+## Summary
+
+- Score: 45/100
+- Grade: High risk
+- Risk level: High
+- Kubernetes target: Not set
+- Profile: Balanced
+- Objects analyzed: 2
+- Analysis time: <timing>
+- Findings: 16
+- Generated timestamp: 2026-04-23 02:30:00 UTC
+
+> High risk: high-risk issues need review
+
+Score 45/100 after reviewing 2 objects across 1 namespace. 1 blocking issue and 15 additional warnings were found.
+
+## Severity Counts
+
+| Critical | High | Medium | Low | Info |
+| --- | --- | --- | --- | --- |
+| 0 | 1 | 7 | 8 | 0 |
+
+## Fix First
+
+1. **Missing readiness probe** on \`Deployment/checkout-api (production)\`
+2. **Deployment rollout availability risk** on \`Deployment/checkout-api (production)\`
+3. **Missing liveness probe** on \`Deployment/checkout-api (production)\`
+
+## Top Findings
+
+Showing 12 of 16 findings.
+4 lower-severity findings hidden to keep this PR summary concise.
+
+1. **[HIGH] Missing readiness probe**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Container "api" in Deployment "checkout-api" does not define a readinessProbe.
+   - Recommendation: Add a readinessProbe for this container. Use the template below as a starting point and adjust the path, port, and timing to match the application.
+   - Suggested fix: Add a readiness probe template
+
+2. **[MEDIUM] Deployment rollout availability risk**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Deployment "checkout-api" sets rollingUpdate.maxUnavailable to 1, which allows 1 unavailable pod during rollout with only 2 replicas.
+   - Recommendation: Reduce maxUnavailable for this Deployment. For small replica counts, maxUnavailable: 0 is the safest default when uninterrupted traffic matters.
+   - Suggested fix: Reduce rollout unavailability so the Deployment keeps enough ready pods.
+
+3. **[MEDIUM] Missing liveness probe**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Container "api" in Deployment "checkout-api" does not define a livenessProbe.
+   - Recommendation: Add a livenessProbe that reflects real stuck-process behavior. Use the template below as a starting point and adjust the path, port, and timing to match the application.
+   - Suggested fix: Add a liveness probe template
+
+4. **[MEDIUM] Missing resource limits**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Container "api" in Deployment "checkout-api" is missing both memory and CPU limits.
+   - Recommendation: Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned.
+   - Suggested fix: Add resource requests and limits
+
+5. **[MEDIUM] Missing resource requests**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Container "api" in Deployment "checkout-api" is missing cpu and memory requests.
+   - Recommendation: Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value.
+   - Suggested fix: Add resource requests and limits
+
+6. **[MEDIUM] Mutable image tag**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Container "api" in Deployment "checkout-api" uses image "ghcr.io/example/checkout-api:latest" with the mutable ":latest" tag.
+   - Recommendation: Pin the image to an explicit version tag or, better, an image digest so deployments stay reproducible.
+   - Suggested fix: Pin the image to an immutable tag or digest
+
+7. **[MEDIUM] Missing seccomp profile**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: security
+   - Finding: Container "api" in Deployment "checkout-api" does not set a seccomp profile.
+   - Recommendation: Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.
+   - Suggested fix: Add a reviewed securityContext baseline
+
+8. **[MEDIUM] runAsNonRoot should be true**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: security
+   - Finding: Container "api" in Deployment "checkout-api" does not set runAsNonRoot: true at the pod or container level.
+   - Recommendation: Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.
+   - Suggested fix: Add a reviewed securityContext baseline
+
+9. **[LOW] Missing PodDisruptionBudget**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: reliability
+   - Finding: Deployment "checkout-api" has 2 replicas but no matching PodDisruptionBudget.
+   - Recommendation: Add a PodDisruptionBudget that matches this workload's labels and still permits at least one pod of temporary unavailability during voluntary disruptions.
+   - Suggested fix: Create a PodDisruptionBudget for checkout-api
+
+10. **[LOW] allowPrivilegeEscalation should be false**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: security
+   - Finding: Container "api" in Deployment "checkout-api" does not set allowPrivilegeEscalation: false.
+   - Recommendation: Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.
+   - Suggested fix: Add a reviewed securityContext baseline
+
+11. **[LOW] automountServiceAccountToken should usually be false**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: security
+   - Finding: Deployment "checkout-api" does not set automountServiceAccountToken: false.
+   - Recommendation: Set automountServiceAccountToken: false unless the workload has a reviewed reason to call the Kubernetes API.
+   - Suggested fix: Disable automatic service account token mounting for app workloads that do not need cluster API access.
+
+12. **[LOW] Capabilities should drop ALL by default**
+   - Resource: \`Deployment/checkout-api (production)\`
+   - Category: security
+   - Finding: Container "api" in Deployment "checkout-api" does not drop all capabilities before adding exceptions.
+   - Recommendation: Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.
+   - Suggested fix: Add a reviewed securityContext baseline
+
+## Review Notes
+
+- Next step: Fix first: Missing readiness probe; Deployment rollout availability risk; Missing liveness probe. After those are resolved, review the lower-severity findings before shipping.
+- Share safety: No secret-like values were detected in findings.
+"
+`;

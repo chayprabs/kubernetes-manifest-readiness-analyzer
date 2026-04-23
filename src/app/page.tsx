@@ -26,46 +26,50 @@ export default function Home() {
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <Card>
           <CardHeader className="gap-5">
-            <Badge variant="info">Design system foundation</Badge>
+            <Badge variant="info">Now live</Badge>
             <div className="space-y-4">
               <CardTitle className="max-w-3xl text-4xl sm:text-5xl">
-                Authos is building serious browser-first tooling for engineering
-                teams.
+                Authos launches with a local Kubernetes manifest analyzer for
+                production-readiness reviews.
               </CardTitle>
               <CardDescription className="max-w-2xl text-lg">
-                The first release focuses on Kubernetes manifest review so teams
-                can inspect production-readiness, runtime safety, and deployment
-                hygiene inside a fast, bookmarkable workspace.
+                Paste YAML, upload manifest files, and review probes,
+                resources, runtime hardening, selectors, and exposure risks
+                without a backend roundtrip, database, or account.
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 sm:flex-row">
-            <Button asChild>
-              <Link href="/tools">Explore tools</Link>
-            </Button>
             {primaryTool ? (
-              <Button asChild variant="outline">
+              <Button asChild>
                 <Link href={primaryTool.slug}>Open {primaryTool.name}</Link>
               </Button>
             ) : null}
+            <Button asChild variant="outline">
+              <Link href="/tools">Explore tools</Link>
+            </Button>
           </CardContent>
         </Card>
 
         <Card className="bg-background-muted/70">
           <CardHeader className="gap-3">
             <p className="text-muted font-mono text-xs tracking-[0.24em] uppercase">
-              First registered tool
+              Launch snapshot
             </p>
             <CardTitle>{primaryTool?.name}</CardTitle>
-            <CardDescription>{primaryTool?.description}</CardDescription>
+            <CardDescription>
+              The first Authos tool is live now and designed for fast local
+              review of Kubernetes deploy bundles before they reach CI or
+              production.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
             <div className="border-border bg-card rounded-2xl border p-4">
               <p className="text-muted font-mono text-xs tracking-[0.18em] uppercase">
-                Category
+                Privacy posture
               </p>
               <p className="text-foreground mt-2 text-sm">
-                {primaryTool?.category}
+                Local analysis by default
               </p>
             </div>
             <div className="border-border bg-card rounded-2xl border p-4">
@@ -82,35 +86,36 @@ export default function Home() {
 
       <section className="space-y-8">
         <SectionHeading
-          eyebrow="Launch focus"
+          eyebrow="Why Authos"
           title={siteConfig.mission}
-          description="The shell, registry, metadata, and primitives are designed so new tools can arrive without rewriting the overall site."
+          description="The launch product is meant to feel useful on day one, while still being a clean base for additional Authos tools."
         />
         <div className="grid gap-6 lg:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>Registry-driven structure</CardTitle>
+              <CardTitle>High-trust workflow</CardTitle>
               <CardDescription>
-                Tool definitions now live in one place so catalog pages, nav,
-                and metadata can scale cleanly as Authos grows.
+                The analyzer runs in the browser, keeps raw YAML out of
+                localStorage, and redacts exports by default.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Browser-first workflows</CardTitle>
+              <CardTitle>Serious Kubernetes checks</CardTitle>
               <CardDescription>
-                Core tools are framed for local processing whenever possible,
-                keeping sensitive engineering inputs closer to the developer.
+                Production-readiness, reliability, security, networking,
+                deprecation, and remediation guidance are all wired into the
+                same workspace.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Neutral design system</CardTitle>
+              <CardTitle>Ready to expand</CardTitle>
               <CardDescription>
-                The interface is intentionally compact, trustworthy, and easy to
-                redesign once the final brand is locked.
+                The catalog, metadata, and registry model are already in place
+                so future Authos tools can ship without reworking the site.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -120,8 +125,8 @@ export default function Home() {
       <section className="space-y-8">
         <SectionHeading
           eyebrow="Featured tools"
-          title="Registered tools from the Authos catalog"
-          description="This section is powered by the registry, so future tools can appear here and on the catalog page from the same source of truth."
+          title="Current Authos tools"
+          description="The catalog is intentionally small at launch: one serious tool, clearly described roadmap placeholders, and no fake product sprawl."
         />
         <div className="grid gap-6">
           {featuredTools.map((tool) => (

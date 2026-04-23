@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getCanonicalUrl } from "@/lib/site";
+import { getCanonicalUrl, siteMetadataBase } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
+    host: siteMetadataBase.host,
     sitemap: getCanonicalUrl("/sitemap.xml"),
   };
 }

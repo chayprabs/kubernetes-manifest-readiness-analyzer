@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { FileCode2, LoaderCircle, ShieldCheck } from "lucide-react";
 import { findingCategories, getFindingSeverityRank } from "@/lib/k8s/findings";
 import type {
@@ -67,6 +69,7 @@ type K8sResultsDashboardProps = {
   onAnalyzeCurrentDraft?: () => void;
   onFocusManifestInput?: () => void;
   onLoadStarterSample?: () => void;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
 type RelationshipSection = {
@@ -101,6 +104,7 @@ export function K8sResultsDashboard({
   onAnalyzeCurrentDraft,
   onFocusManifestInput,
   onLoadStarterSample,
+  analyticsPayload,
 }: K8sResultsDashboardProps) {
   const [filters, setFilters] = useState<FindingFilterState>(
     defaultFindingFilterState,
@@ -418,7 +422,10 @@ export function K8sResultsDashboard({
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <K8sScoreSummary report={report} stale={stale} />
-        <FixFirstPanel findings={report.fixFirstFindings.slice(0, 3)} />
+        <FixFirstPanel
+          findings={report.fixFirstFindings.slice(0, 3)}
+          analyticsPayload={analyticsPayload}
+        />
       </div>
 
       <SeveritySummaryCards severityCounts={report.severityCounts} />
@@ -485,6 +492,7 @@ export function K8sResultsDashboard({
                     ? "No production-readiness issues found by these checks. This is not a guarantee of cluster safety."
                     : "Adjust the severity, category, namespace, resource kind, or search filters to widen the view."
                 }
+                analyticsPayload={analyticsPayload}
               />
             </div>
 
@@ -531,6 +539,7 @@ export function K8sResultsDashboard({
           <FixesTab
             findings={fixableFindings}
             totalFixCount={allFixableFindings.length}
+            analyticsPayload={analyticsPayload}
           />
         </TabsContent>
 
@@ -555,6 +564,9 @@ export function K8sResultsDashboard({
                   label="Copy JSON"
                   ariaLabel="Copy raw report JSON"
                   showInlineFeedback
+                  onCopySuccess={() =>
+                    trackAnalyticsEvent("report_copied", analyticsPayload)
+                  }
                 />
               </div>
             </CardHeader>

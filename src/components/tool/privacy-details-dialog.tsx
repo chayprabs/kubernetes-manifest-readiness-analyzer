@@ -50,6 +50,11 @@ export function PrivacyDetailsDialog({
             you explicitly choose otherwise.
           </p>
           <p>
+            Analytics is disabled unless a safe public endpoint is configured.
+            Even then, only sanitized counts, buckets, selected options, and
+            coarse error categories can leave the browser.
+          </p>
+          <p>
             If you include a manifest in an export, the UI warns first because
             Kubernetes YAML can carry Secret data, internal service names,
             annotations, tokens, and certificate references.

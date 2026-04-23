@@ -47,7 +47,7 @@ export const toolRegistry: ToolDefinition[] = [
       "SRE teams",
       "Application developers shipping to Kubernetes",
     ],
-    status: "Foundational",
+    status: "Live",
     seoTitle:
       "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | Authos",
     seoDescription:

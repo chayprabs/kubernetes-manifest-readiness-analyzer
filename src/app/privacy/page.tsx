@@ -37,10 +37,10 @@ export default function PrivacyPage() {
           <CardHeader>
             <CardTitle>Core product boundary</CardTitle>
             <CardDescription>
-              This foundation does not include authentication, a server
-              database, analytics pipelines, or third-party AI APIs for this
-              tool. The current focus is the browser app shell, tool
-              architecture, and quality checks.
+              This product does not require authentication, backend storage, or
+              third-party AI APIs for the Kubernetes analyzer. Optional
+              analytics stays off by default and only supports sanitized public
+              event payloads when explicitly configured.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -73,11 +73,13 @@ export default function PrivacyPage() {
         <Card>
           <CardHeader>
             <Badge variant="info">Telemetry</Badge>
-            <CardTitle>No raw manifest analytics</CardTitle>
+            <CardTitle>Safe analytics only, and off by default</CardTitle>
           </CardHeader>
           <CardContent className="text-muted text-sm leading-7">
-            If analytics are added later, they should be limited to timings,
-            counts, and selected options. Raw YAML and finding text stay out.
+            If analytics is enabled through public environment variables, it is
+            limited to timings, counts, selected options, and coarse error
+            categories. Raw YAML, resource names, namespaces, and finding text
+            stay out.
           </CardContent>
         </Card>
       </div>

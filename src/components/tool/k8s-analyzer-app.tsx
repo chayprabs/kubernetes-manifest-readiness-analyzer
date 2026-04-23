@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {
   useEffect,
-  useEffectEvent,
+  useCallback,
   useMemo,
   useRef,
   useState,
@@ -13,6 +13,12 @@ import {
   type ReactNode,
 } from "react";
 import type { OnMount } from "@monaco-editor/react";
+import {
+  createK8sAnalyticsPayloadInput,
+  createK8sAnalyticsPayloadInputFromReport,
+  getAnalyticsBrowserLocale,
+} from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import {
   ChevronDown,
   ClipboardPaste,
@@ -51,7 +57,10 @@ import type {
   K8sAnalyzerOptions,
   K8sAnalyzerProfileId,
 } from "@/lib/k8s/types";
-import { kubernetesManifestAnalyzerH1 } from "@/lib/k8s/landing-content";
+import {
+  kubernetesManifestAnalyzerH1,
+  kubernetesManifestAnalyzerToolId,
+} from "@/lib/k8s/landing-content";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout/container";
 import { useTheme } from "@/components/theme/theme-provider";
@@ -204,7 +213,7 @@ export function K8sAnalyzerApp() {
   const [editorMode, setEditorMode] = useState<
     "loading" | "monaco" | "fallback"
   >("loading");
-  const initialSettings = useMemo(readStoredSettings, []);
+  const initialSettings = useMemo(() => readStoredSettings(), []);
   const [yamlInput, setYamlInput] = useState("");
   const [selectedVersion, setSelectedVersion] = useState(
     initialSettings.kubernetesTargetVersion,
@@ -308,8 +317,43 @@ export function K8sAnalyzerApp() {
   );
   const hasWorkspaceContent =
     hasInput || uploadedFiles.length > 0 || report !== null;
+  const browserLocale = useMemo(() => getAnalyticsBrowserLocale(), []);
+  const draftDocumentCount = useMemo(
+    () => estimateYamlDocumentCount(yamlInput),
+    [yamlInput],
+  );
+  const draftAnalyticsPayload = useMemo(
+    () =>
+      createK8sAnalyticsPayloadInput({
+        toolId: kubernetesManifestAnalyzerToolId,
+        profile: selectedProfile,
+        kubernetesVersion: selectedVersion,
+        inputSizeBytes: hasInput ? inputSizeBytes : undefined,
+        documentCount: hasInput ? draftDocumentCount : undefined,
+        browserLocale,
+      }),
+    [
+      browserLocale,
+      draftDocumentCount,
+      hasInput,
+      inputSizeBytes,
+      selectedProfile,
+      selectedVersion,
+    ],
+  );
+  const reportAnalyticsPayload = useMemo(
+    () =>
+      report
+        ? createK8sAnalyticsPayloadInputFromReport({
+            toolId: kubernetesManifestAnalyzerToolId,
+            report,
+            browserLocale,
+          })
+        : draftAnalyticsPayload,
+    [browserLocale, draftAnalyticsPayload, report],
+  );
 
-  const focusEditor = useEffectEvent(
+  const focusEditor = useCallback(
     (options: { scroll?: boolean; placeCursorAtEnd?: boolean } = {}) => {
       const { scroll = true, placeCursorAtEnd = true } = options;
 
@@ -362,12 +406,22 @@ export function K8sAnalyzerApp() {
         manifestInputSectionRef.current?.focus();
       });
     },
+    [editorMode],
   );
 
-  const persistSettings = useEffectEvent((settings: StoredAnalyzerSettings) => {
+  useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
+
+    const settings: StoredAnalyzerSettings = {
+      rememberSettings,
+      kubernetesTargetVersion: selectedVersion,
+      profile: selectedProfile,
+      namespaceFilter,
+      autoAnalyze,
+      softWrap,
+    };
 
     if (!settings.rememberSettings) {
       window.localStorage.removeItem(SETTINGS_STORAGE_KEY);
@@ -375,21 +429,9 @@ export function K8sAnalyzerApp() {
     }
 
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  });
-
-  useEffect(() => {
-    persistSettings({
-      rememberSettings,
-      kubernetesTargetVersion: selectedVersion,
-      profile: selectedProfile,
-      namespaceFilter,
-      autoAnalyze,
-      softWrap,
-    });
   }, [
     autoAnalyze,
     namespaceFilter,
-    persistSettings,
     rememberSettings,
     selectedProfile,
     selectedVersion,
@@ -406,6 +448,22 @@ export function K8sAnalyzerApp() {
   }, []);
 
   useEffect(() => {
+    trackAnalyticsEvent(
+      "tool_viewed",
+      createK8sAnalyticsPayloadInput({
+        toolId: kubernetesManifestAnalyzerToolId,
+        profile: initialSettings.profile,
+        kubernetesVersion: initialSettings.kubernetesTargetVersion,
+        browserLocale,
+      }),
+    );
+  }, [
+    browserLocale,
+    initialSettings.kubernetesTargetVersion,
+    initialSettings.profile,
+  ]);
+
+  useEffect(() => {
     if (
       !hasInput &&
       (report !== null ||
@@ -416,13 +474,19 @@ export function K8sAnalyzerApp() {
       inFlightSignatureRef.current = null;
       activeAbortControllerRef.current?.abort();
       activeAbortControllerRef.current = null;
-      setReport(null);
-      setLastAnalyzedSignature("");
-      setAnalysisStatus(createIdleAnalysisStatus());
+      const timer = window.setTimeout(() => {
+        setReport(null);
+        setLastAnalyzedSignature("");
+        setAnalysisStatus(createIdleAnalysisStatus());
+      }, 0);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
     }
   }, [analysisStatus.phase, hasInput, lastAnalyzedSignature, report]);
 
-  const runAnalysis = useEffectEvent(
+  const runAnalysis = useCallback(
     async (trigger: "manual" | "auto", inputOverride?: string) => {
       const source = inputOverride ?? yamlInput;
       const normalizedSource = source.trim();
@@ -442,6 +506,7 @@ export function K8sAnalyzerApp() {
       }
 
       const sizeBytes = getInputSizeBytes(source);
+      const documentCount = estimateYamlDocumentCount(source);
 
       if (sizeBytes > BROWSER_ANALYSIS_HARD_MAX_BYTES) {
         setNotice({
@@ -468,6 +533,7 @@ export function K8sAnalyzerApp() {
         selectedProfile,
         namespaceFilter,
       );
+      const analysisStartedAt = performance.now();
       let runtime: "worker" | "main-thread" = "worker";
       let completionNotice: AnalyzerNotice | null = null;
 
@@ -475,6 +541,18 @@ export function K8sAnalyzerApp() {
       const abortController = new AbortController();
       activeAbortControllerRef.current = abortController;
       inFlightSignatureRef.current = signature;
+
+      trackAnalyticsEvent(
+        "analysis_started",
+        createK8sAnalyticsPayloadInput({
+          toolId: kubernetesManifestAnalyzerToolId,
+          profile: selectedProfile,
+          kubernetesVersion: selectedVersion,
+          inputSizeBytes: sizeBytes,
+          documentCount,
+          browserLocale,
+        }),
+      );
 
       setAnalysisStatus({
         phase: "analyzing",
@@ -541,6 +619,22 @@ export function K8sAnalyzerApp() {
           return;
         }
 
+        const completedAnalyticsPayload =
+          createK8sAnalyticsPayloadInputFromReport({
+            toolId: kubernetesManifestAnalyzerToolId,
+            report: nextReport,
+            browserLocale,
+          });
+
+        trackAnalyticsEvent("analysis_completed", completedAnalyticsPayload);
+
+        if (nextReport.privacy.sensitiveDataDetected) {
+          trackAnalyticsEvent(
+            "privacy_warning_shown",
+            completedAnalyticsPayload,
+          );
+        }
+
         startTransition(() => {
           setReport(nextReport);
           setLastAnalyzedSignature(signature);
@@ -575,6 +669,18 @@ export function K8sAnalyzerApp() {
             "Analysis stopped before a report was produced.",
           ),
         );
+        trackAnalyticsEvent(
+          "analysis_failed",
+          createK8sAnalyticsPayloadInput({
+            toolId: kubernetesManifestAnalyzerToolId,
+            profile: selectedProfile,
+            kubernetesVersion: selectedVersion,
+            inputSizeBytes: sizeBytes,
+            documentCount,
+            analysisDurationMs: performance.now() - analysisStartedAt,
+            browserLocale,
+          }),
+        );
       } finally {
         if (activeAbortControllerRef.current === abortController) {
           activeAbortControllerRef.current = null;
@@ -588,6 +694,13 @@ export function K8sAnalyzerApp() {
         }
       }
     },
+    [
+      browserLocale,
+      namespaceFilter,
+      selectedProfile,
+      selectedVersion,
+      yamlInput,
+    ],
   );
 
   useEffect(() => {
@@ -617,12 +730,15 @@ export function K8sAnalyzerApp() {
     runAnalysis,
   ]);
 
-  const handleEditorMount = useEffectEvent<OnMount>((editor, monaco) => {
-    monacoEditorRef.current = editor;
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      void runAnalysis("manual");
-    });
-  });
+  const handleEditorMount = useCallback<OnMount>(
+    (editor, monaco) => {
+      monacoEditorRef.current = editor;
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+        void runAnalysis("manual");
+      });
+    },
+    [runAnalysis],
+  );
 
   useEffect(() => {
     function handleGlobalKeydown(event: KeyboardEvent) {
@@ -692,6 +808,17 @@ export function K8sAnalyzerApp() {
       tone: "success",
       text: `${example.title} loaded locally. ${autoAnalyze ? "Analysis will run automatically if the draft stays within the auto-analyze size limit." : "Click Analyze when you are ready."}`,
     });
+    trackAnalyticsEvent(
+      "sample_loaded",
+      createK8sAnalyticsPayloadInput({
+        toolId: kubernetesManifestAnalyzerToolId,
+        profile: selectedProfile,
+        kubernetesVersion: selectedVersion,
+        inputSizeBytes: getInputSizeBytes(example.manifest),
+        documentCount: estimateYamlDocumentCount(example.manifest),
+        browserLocale,
+      }),
+    );
 
     if (options.scrollToEditor || options.focusEditor) {
       focusEditor({
@@ -874,7 +1001,14 @@ export function K8sAnalyzerApp() {
                   {kubernetesManifestAnalyzerH1}
                 </span>
               </div>
-              <Badge variant="info">Client-side Kubernetes review</Badge>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="info">Client-side Kubernetes review</Badge>
+                <Badge variant="outline">
+                  Checks cover Kubernetes{" "}
+                  {supportedKubernetesTargetVersions[0]}-
+                  {supportedKubernetesTargetVersions.at(-1)}
+                </Badge>
+              </div>
               <div className="space-y-3">
                 <h1 className="text-foreground text-4xl font-semibold sm:text-5xl">
                   {kubernetesManifestAnalyzerH1}
@@ -929,7 +1063,7 @@ export function K8sAnalyzerApp() {
                 />
                 <InfoPill
                   label="Trust"
-                  text="Your manifest is analyzed in this browser. It is not uploaded."
+                  text="Raw YAML is analyzed in this browser and is not uploaded."
                 />
                 <InfoPill
                   label="Results"
@@ -1337,6 +1471,7 @@ export function K8sAnalyzerApp() {
                     <K8sReportExportMenu
                       report={report}
                       redactVisibleOutput={redactVisibleOutput}
+                      analyticsPayload={reportAnalyticsPayload}
                     />
                   </div>
                 </div>
@@ -1403,6 +1538,7 @@ export function K8sAnalyzerApp() {
                       focusEditor: true,
                     })
                   }
+                  analyticsPayload={reportAnalyticsPayload}
                 />
               </CardContent>
             </Card>

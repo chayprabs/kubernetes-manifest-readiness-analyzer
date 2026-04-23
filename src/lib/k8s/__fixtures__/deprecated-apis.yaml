@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: legacy-web
+  namespace: legacy
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-prod
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: legacy-suite
+    app.kubernetes.io/managed-by: authos
+    team: platform
+  annotations:
+    owner: platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-web
+  namespace: legacy
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-prod
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: legacy-suite
+    app.kubernetes.io/managed-by: authos
+    team: platform
+  annotations:
+    owner: platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: legacy-web
+      app.kubernetes.io/instance: legacy-prod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: legacy-web
+        app.kubernetes.io/instance: legacy-prod
+    spec:
+      serviceAccountName: legacy-web
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          image: ghcr.io/example/legacy-web:4.1.2
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "750m"
+              memory: "512Mi"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: legacy-web
+  namespace: legacy
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-prod
+spec:
+  selector:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-prod
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: legacy-web-pdb
+  namespace: legacy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: legacy-web
+      app.kubernetes.io/instance: legacy-prod
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: legacy-web
+  namespace: legacy
+spec:
+  rules:
+    - host: legacy.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: legacy-web
+              servicePort: 80
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: nightly-legacy-sync
+  namespace: legacy
+  labels:
+    app.kubernetes.io/name: nightly-legacy-sync
+    app.kubernetes.io/part-of: legacy-suite
+    app.kubernetes.io/managed-by: authos
+    team: platform
+  annotations:
+    owner: platform
+spec:
+  schedule: "15 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: sync
+              image: ghcr.io/example/legacy-sync:1.0.4
+              args:
+                - /bin/sh
+                - -c
+                - sync-legacy-data.sh
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: legacy-psp
+spec:
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - configMap
+    - secret
+    - persistentVolumeClaim
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: legacy-default-deny
+  namespace: legacy
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

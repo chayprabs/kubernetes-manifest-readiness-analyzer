@@ -1,0 +1,1749 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Kubernetes golden report snapshots > keeps the broken production sample stable 1`] = `
+{
+  "analysisMetadata": {
+    "analyzeMs": "<timing>",
+    "documentCount": 2,
+    "inputBytes": 1447,
+    "parseMs": "<timing>",
+    "totalMs": "<timing>",
+  },
+  "canShareReportSafely": true,
+  "categoryCounts": {
+    "api-version": 0,
+    "best-practice": 0,
+    "cost": 0,
+    "networking": 1,
+    "operations": 0,
+    "reliability": 7,
+    "scalability": 0,
+    "schema": 0,
+    "security": 8,
+  },
+  "categoryScores": {
+    "api-version": 100,
+    "networking": 92,
+    "operations": 100,
+    "reliability": 0,
+    "security": 28,
+  },
+  "findings": [
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+        "safeToAutoApply": false,
+        "title": "Add a readiness probe template",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].readinessProbe",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not define a readinessProbe.",
+      "recommendation": "Add a readinessProbe for this container. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-readiness-probe",
+      "severity": "high",
+      "title": "Missing readiness probe",
+      "yamlPath": "spec.template.spec.containers[name=api].readinessProbe",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1",
+        "safeToAutoApply": false,
+        "title": "Reduce rollout unavailability so the Deployment keeps enough ready pods.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.strategy.rollingUpdate.maxUnavailable",
+      },
+      "message": "Deployment "checkout-api" sets rollingUpdate.maxUnavailable to 1, which allows 1 unavailable pod during rollout with only 2 replicas.",
+      "recommendation": "Reduce maxUnavailable for this Deployment. For small replica counts, maxUnavailable: 0 is the safest default when uninterrupted traffic matters.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "deployment-max-unavailable-risk",
+      "severity": "medium",
+      "title": "Deployment rollout availability risk",
+      "yamlPath": "spec.strategy.rollingUpdate.maxUnavailable",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+livenessProbe:
+  httpGet:
+    path: /livez
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+        "safeToAutoApply": false,
+        "title": "Add a liveness probe template",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].livenessProbe",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not define a livenessProbe.",
+      "recommendation": "Add a livenessProbe that reflects real stuck-process behavior. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-liveness-probe",
+      "severity": "medium",
+      "title": "Missing liveness probe",
+      "yamlPath": "spec.template.spec.containers[name=api].livenessProbe",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+        "safeToAutoApply": false,
+        "title": "Add resource requests and limits",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].resources.limits",
+      },
+      "message": "Container "api" in Deployment "checkout-api" is missing both memory and CPU limits.",
+      "recommendation": "Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-resource-limits",
+      "severity": "medium",
+      "title": "Missing resource limits",
+      "yamlPath": "spec.template.spec.containers[name=api].resources.limits",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+        "safeToAutoApply": false,
+        "title": "Add resource requests and limits",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].resources.requests",
+      },
+      "message": "Container "api" in Deployment "checkout-api" is missing cpu and memory requests.",
+      "recommendation": "Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-resource-requests",
+      "severity": "medium",
+      "title": "Missing resource requests",
+      "yamlPath": "spec.template.spec.containers[name=api].resources.requests",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Example only: replace this with the immutable version or digest produced by your release pipeline.
+image: ghcr.io/example/checkout-api:1.2.3
+# or
+image: ghcr.io/example/checkout-api@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "instructions": "Replace :latest or an untagged image with a reviewed version tag or image digest from your build pipeline so rollouts stay reproducible.",
+        "preview": {
+          "after": "image: ghcr.io/example/checkout-api:1.2.3",
+          "before": "image: ghcr.io/example/checkout-api:latest",
+        },
+        "safeToAutoApply": false,
+        "title": "Pin the image to an immutable tag or digest",
+        "type": "manual-instruction",
+        "yamlPath": "spec.template.spec.containers[name=api].image",
+      },
+      "message": "Container "api" in Deployment "checkout-api" uses image "ghcr.io/example/checkout-api:latest" with the mutable ":latest" tag.",
+      "recommendation": "Pin the image to an explicit version tag or, better, an image digest so deployments stay reproducible.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "mutable-image-tag",
+      "severity": "medium",
+      "title": "Mutable image tag",
+      "yamlPath": "spec.template.spec.containers[name=api].image",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.securityContext.seccompProfile",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not set a seccomp profile.",
+      "recommendation": "Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-seccomp-profile",
+      "severity": "medium",
+      "title": "Missing seccomp profile",
+      "yamlPath": "spec.template.spec.securityContext.seccompProfile",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.securityContext.runAsNonRoot",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not set runAsNonRoot: true at the pod or container level.",
+      "recommendation": "Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "run-as-non-root",
+      "severity": "medium",
+      "title": "runAsNonRoot should be true",
+      "yamlPath": "spec.template.spec.securityContext.runAsNonRoot",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# New resource suggestion: confirm the selector and disruption budget match your rollout and maintenance behavior.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: checkout-api-pdb
+  namespace: production
+spec:
+  minAvailable: 1",
+        "safeToAutoApply": false,
+        "title": "Create a PodDisruptionBudget for checkout-api",
+        "type": "new-resource",
+        "yamlPath": "spec",
+      },
+      "message": "Deployment "checkout-api" has 2 replicas but no matching PodDisruptionBudget.",
+      "recommendation": "Add a PodDisruptionBudget that matches this workload's labels and still permits at least one pod of temporary unavailability during voluntary disruptions.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-pod-disruption-budget",
+      "severity": "low",
+      "title": "Missing PodDisruptionBudget",
+      "yamlPath": "spec",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].securityContext.allowPrivilegeEscalation",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not set allowPrivilegeEscalation: false.",
+      "recommendation": "Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "allow-privilege-escalation",
+      "severity": "low",
+      "title": "allowPrivilegeEscalation should be false",
+      "yamlPath": "spec.template.spec.containers[name=api].securityContext.allowPrivilegeEscalation",
+    },
+    {
+      "category": "security",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "automountServiceAccountToken: false",
+        "safeToAutoApply": false,
+        "title": "Disable automatic service account token mounting for app workloads that do not need cluster API access.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.automountServiceAccountToken",
+      },
+      "message": "Deployment "checkout-api" does not set automountServiceAccountToken: false.",
+      "recommendation": "Set automountServiceAccountToken: false unless the workload has a reviewed reason to call the Kubernetes API.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "automount-service-account-token",
+      "severity": "low",
+      "title": "automountServiceAccountToken should usually be false",
+      "yamlPath": "spec.template.spec.automountServiceAccountToken",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].securityContext.capabilities",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not drop all capabilities before adding exceptions.",
+      "recommendation": "Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "capabilities-not-dropping-all",
+      "severity": "low",
+      "title": "Capabilities should drop ALL by default",
+      "yamlPath": "spec.template.spec.containers[name=api].securityContext.capabilities",
+    },
+    {
+      "category": "security",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].securityContext",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not set runAsNonRoot or runAsUser, so the image could still start as root by default.",
+      "recommendation": "Set runAsNonRoot: true explicitly and, when needed, choose a reviewed non-zero UID for the container.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "container-may-run-as-root-by-default",
+      "severity": "low",
+      "title": "Container may run as root by default",
+      "yamlPath": "spec.template.spec.containers[name=api].securityContext",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "serviceAccountName: app-sa
+automountServiceAccountToken: false",
+        "safeToAutoApply": false,
+        "title": "Move the workload off the default ServiceAccount and disable token mounting if the API is unnecessary.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec",
+      },
+      "message": "Deployment "checkout-api" uses the default ServiceAccount with its token mount still enabled.",
+      "recommendation": "Use a dedicated ServiceAccount for workloads that need cluster API access, and disable token mounting when they do not.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "default-serviceaccount-usage",
+      "severity": "low",
+      "title": "Production workload uses the default ServiceAccount",
+      "yamlPath": "spec.template.spec.serviceAccountName",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].securityContext.readOnlyRootFilesystem",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not set readOnlyRootFilesystem: true.",
+      "recommendation": "Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "read-only-root-filesystem",
+      "severity": "low",
+      "title": "readOnlyRootFilesystem should be true",
+      "yamlPath": "spec.template.spec.containers[name=api].securityContext.readOnlyRootFilesystem",
+    },
+    {
+      "category": "networking",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:",
+        "safeToAutoApply": false,
+        "title": "Start with a minimal default-deny policy and stage explicit allow rules carefully.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec",
+      },
+      "message": "Namespace "production" has application workloads but no NetworkPolicy resources in the manifest set.",
+      "recommendation": "Add at least a reviewed baseline NetworkPolicy for this namespace. A default-deny policy is a careful rollout item that usually needs explicit allow rules alongside it.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "networkpolicy-absent-for-namespace",
+      "severity": "low",
+      "title": "Namespace has no NetworkPolicy",
+      "yamlPath": "spec",
+    },
+  ],
+  "fixFirstFindings": [
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+        "safeToAutoApply": false,
+        "title": "Add a readiness probe template",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].readinessProbe",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not define a readinessProbe.",
+      "recommendation": "Add a readinessProbe for this container. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-readiness-probe",
+      "severity": "high",
+      "title": "Missing readiness probe",
+      "yamlPath": "spec.template.spec.containers[name=api].readinessProbe",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1",
+        "safeToAutoApply": false,
+        "title": "Reduce rollout unavailability so the Deployment keeps enough ready pods.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.strategy.rollingUpdate.maxUnavailable",
+      },
+      "message": "Deployment "checkout-api" sets rollingUpdate.maxUnavailable to 1, which allows 1 unavailable pod during rollout with only 2 replicas.",
+      "recommendation": "Reduce maxUnavailable for this Deployment. For small replica counts, maxUnavailable: 0 is the safest default when uninterrupted traffic matters.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "deployment-max-unavailable-risk",
+      "severity": "medium",
+      "title": "Deployment rollout availability risk",
+      "yamlPath": "spec.strategy.rollingUpdate.maxUnavailable",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder only: adjust the endpoint, port, and timing for your application before using this probe.
+livenessProbe:
+  httpGet:
+    path: /livez
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3",
+        "safeToAutoApply": false,
+        "title": "Add a liveness probe template",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=api].livenessProbe",
+      },
+      "message": "Container "api" in Deployment "checkout-api" does not define a livenessProbe.",
+      "recommendation": "Add a livenessProbe that reflects real stuck-process behavior. Use the template below as a starting point and adjust the path, port, and timing to match the application.",
+      "resource": "Deployment/checkout-api (production)",
+      "ruleId": "missing-liveness-probe",
+      "severity": "medium",
+      "title": "Missing liveness probe",
+      "yamlPath": "spec.template.spec.containers[name=api].livenessProbe",
+    },
+  ],
+  "headline": "High risk: high-risk issues need review",
+  "message": "Analysis completed successfully.",
+  "nextSteps": "Fix first: Missing readiness probe; Deployment rollout availability risk; Missing liveness probe. After those are resolved, review the lower-severity findings before shipping.",
+  "ok": true,
+  "options": {
+    "includeInfoFindings": false,
+    "kubernetesTargetVersion": undefined,
+    "namespaceFilter": undefined,
+    "profile": "balanced",
+    "strictSecurity": false,
+  },
+  "parseIssues": [],
+  "positiveChecks": [],
+  "privacy": {
+    "detectedKinds": [],
+    "sensitiveDataDetected": false,
+    "signalCount": 0,
+    "signals": [],
+    "warningText": "Visible exports still exclude raw YAML by default, but this report did not detect obvious Secret values, sensitive env literals, or risky annotations.",
+    "warningTitle": "No obvious sensitive manifest values detected",
+  },
+  "profile": "balanced",
+  "readinessGrade": "High risk",
+  "readinessScore": 45,
+  "relationshipIssues": [],
+  "resourceCounts": {
+    "byKind": {
+      "Deployment": 1,
+      "Service": 1,
+    },
+    "total": 2,
+  },
+  "resourceSummary": {
+    "ingressesFound": 0,
+    "namespacesFound": [
+      "production",
+    ],
+    "networkPoliciesFound": 0,
+    "pdbsFound": 0,
+    "servicesFound": 1,
+    "totalObjects": 2,
+    "workloadsFound": 1,
+  },
+  "riskLevel": "high",
+  "severityCounts": {
+    "critical": 0,
+    "high": 1,
+    "info": 0,
+    "low": 8,
+    "medium": 7,
+  },
+  "state": "ready",
+  "summary": "Score 45/100 after reviewing 2 objects across 1 namespace. 1 blocking issue and 15 additional warnings were found.",
+}
+`;
+
+exports[`Kubernetes golden report snapshots > keeps the clean production sample stable 1`] = `
+{
+  "analysisMetadata": {
+    "analyzeMs": "<timing>",
+    "documentCount": 5,
+    "inputBytes": 3478,
+    "parseMs": "<timing>",
+    "totalMs": "<timing>",
+  },
+  "canShareReportSafely": true,
+  "categoryCounts": {
+    "api-version": 0,
+    "best-practice": 0,
+    "cost": 0,
+    "networking": 0,
+    "operations": 0,
+    "reliability": 0,
+    "scalability": 0,
+    "schema": 0,
+    "security": 0,
+  },
+  "categoryScores": {
+    "api-version": 100,
+    "networking": 100,
+    "operations": 100,
+    "reliability": 100,
+    "security": 100,
+  },
+  "findings": [],
+  "fixFirstFindings": [],
+  "headline": "Production ready with minor notes",
+  "message": "No findings were produced for the current manifest set.",
+  "nextSteps": "No must-fix issues were detected for this profile. Keep validating rollout behavior, access controls, and application-specific health endpoints before release.",
+  "ok": true,
+  "options": {
+    "includeInfoFindings": false,
+    "kubernetesTargetVersion": undefined,
+    "namespaceFilter": undefined,
+    "profile": "balanced",
+    "strictSecurity": false,
+  },
+  "parseIssues": [],
+  "positiveChecks": [
+    {
+      "id": "readiness-probes-present",
+      "summary": "Readiness probes are present on the long-running application containers in this manifest set.",
+      "title": "Readiness probes present",
+    },
+    {
+      "id": "resources-configured",
+      "summary": "CPU and memory requests are set, and memory limits are present for the reviewed workload containers.",
+      "title": "Resources configured",
+    },
+    {
+      "id": "pdb-present",
+      "summary": "A matching PodDisruptionBudget is present for the multi-replica Deployment and StatefulSet workloads in this manifest set.",
+      "title": "PDB present",
+    },
+    {
+      "id": "securitycontext-hardened",
+      "summary": "The reviewed app containers set non-root execution, privilege controls, capability drops, and seccomp hardening.",
+      "title": "SecurityContext hardened",
+    },
+  ],
+  "privacy": {
+    "detectedKinds": [],
+    "sensitiveDataDetected": false,
+    "signalCount": 0,
+    "signals": [],
+    "warningText": "Visible exports still exclude raw YAML by default, but this report did not detect obvious Secret values, sensitive env literals, or risky annotations.",
+    "warningTitle": "No obvious sensitive manifest values detected",
+  },
+  "profile": "balanced",
+  "readinessGrade": "Production ready with minor notes",
+  "readinessScore": 100,
+  "relationshipIssues": [],
+  "resourceCounts": {
+    "byKind": {
+      "Deployment": 1,
+      "NetworkPolicy": 1,
+      "PodDisruptionBudget": 1,
+      "Service": 1,
+      "ServiceAccount": 1,
+    },
+    "total": 5,
+  },
+  "resourceSummary": {
+    "ingressesFound": 0,
+    "namespacesFound": [
+      "production",
+    ],
+    "networkPoliciesFound": 1,
+    "pdbsFound": 1,
+    "servicesFound": 1,
+    "totalObjects": 5,
+    "workloadsFound": 1,
+  },
+  "riskLevel": "low",
+  "severityCounts": {
+    "critical": 0,
+    "high": 0,
+    "info": 0,
+    "low": 0,
+    "medium": 0,
+  },
+  "state": "ready",
+  "summary": "Analyzed 5 objects across 1 namespace. No production-readiness findings were produced for this profile.",
+}
+`;
+
+exports[`Kubernetes golden report snapshots > keeps the deprecated API sample stable 1`] = `
+{
+  "analysisMetadata": {
+    "analyzeMs": "<timing>",
+    "documentCount": 8,
+    "inputBytes": 4064,
+    "parseMs": "<timing>",
+    "totalMs": "<timing>",
+  },
+  "canShareReportSafely": true,
+  "categoryCounts": {
+    "api-version": 5,
+    "best-practice": 2,
+    "cost": 0,
+    "networking": 1,
+    "operations": 2,
+    "reliability": 2,
+    "scalability": 0,
+    "schema": 0,
+    "security": 6,
+  },
+  "categoryScores": {
+    "api-version": 0,
+    "networking": 67,
+    "operations": 38,
+    "reliability": 47,
+    "security": 33,
+  },
+  "findings": [
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "instructions": "PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook.",
+        "preview": {
+          "after": undefined,
+          "before": "apiVersion: policy/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Review the deprecated API migration path",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "PodSecurityPolicy "legacy-psp" uses policy/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook.",
+      "resource": "PodSecurityPolicy/legacy-psp",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "instructions": "PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook.",
+        "preview": {
+          "after": undefined,
+          "before": "apiVersion: policy/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Review the deprecated API migration path",
+        "type": "manual-instruction",
+        "yamlPath": "kind",
+      },
+      "message": "PodSecurityPolicy "legacy-psp" is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "Migrate to Pod Security Admission or a reviewed third-party admission webhook before relying on this policy in newer clusters.",
+      "resource": "PodSecurityPolicy/legacy-psp",
+      "ruleId": "podsecuritypolicy-removed",
+      "severity": "high",
+      "title": "PodSecurityPolicy is removed",
+      "yamlPath": "kind",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: batch/v1",
+        "instructions": "Update apiVersion to batch/v1, then review any schema changes before applying the manifest.",
+        "preview": {
+          "after": "apiVersion: batch/v1",
+          "before": "apiVersion: batch/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Plan a migration to batch/v1",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "CronJob "nightly-legacy-sync" uses batch/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "Update this manifest to a served API version before relying on a cluster upgrade. Migrate to batch/v1, available since v1.21.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: networking.k8s.io/v1",
+        "instructions": "Update apiVersion to networking.k8s.io/v1, then review any schema changes before applying the manifest. Ingress v1 renames backend fields and requires pathType on each path.",
+        "preview": {
+          "after": "apiVersion: networking.k8s.io/v1",
+          "before": "apiVersion: networking.k8s.io/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Plan a migration to networking.k8s.io/v1",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "Ingress "legacy-web" uses networking.k8s.io/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "Ingress v1 renames backend fields and requires pathType on each path. Migrate to networking.k8s.io/v1, available since v1.19.",
+      "resource": "Ingress/legacy-web (legacy)",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: policy/v1",
+        "instructions": "Update apiVersion to policy/v1, then review any schema changes before applying the manifest. policy/v1 changes empty selector behavior: {} selects all pods in the namespace.",
+        "preview": {
+          "after": "apiVersion: policy/v1",
+          "before": "apiVersion: policy/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Plan a migration to policy/v1",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "PodDisruptionBudget "legacy-web-pdb" uses policy/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "policy/v1 changes empty selector behavior: {} selects all pods in the namespace. Migrate to policy/v1, available since v1.21.",
+      "resource": "PodDisruptionBudget/legacy-web-pdb (legacy)",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+        "safeToAutoApply": false,
+        "title": "Add resource requests and limits",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].resources.limits",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" is missing both memory and CPU limits.",
+      "recommendation": "Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "missing-resource-limits",
+      "severity": "medium",
+      "title": "Missing resource limits",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].resources.limits",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder values only: tune requests and limits from real usage, latency SLOs, and CPU throttling data.
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi",
+        "safeToAutoApply": false,
+        "title": "Add resource requests and limits",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].resources.requests",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" is missing cpu and memory requests.",
+      "recommendation": "Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "missing-resource-requests",
+      "severity": "medium",
+      "title": "Missing resource requests",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].resources.requests",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.securityContext.seccompProfile",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not set a seccomp profile.",
+      "recommendation": "Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "missing-seccomp-profile",
+      "severity": "medium",
+      "title": "Missing seccomp profile",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.securityContext.seccompProfile",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not set runAsNonRoot: true at the pod or container level.",
+      "recommendation": "Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "run-as-non-root",
+      "severity": "medium",
+      "title": "runAsNonRoot should be true",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot",
+    },
+    {
+      "category": "networking",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Placeholder only: replace the host and secretName with the certificate mapping your ingress controller actually uses.
+tls:
+  - hosts:
+      - legacy.example.com
+    secretName: legacy-example-com-tls",
+        "safeToAutoApply": false,
+        "title": "Add an Ingress TLS block",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.tls",
+      },
+      "message": "Ingress "legacy-web" does not define spec.tls.",
+      "recommendation": "Add a TLS block for the intended hosts and bind it to the certificate secret your ingress controller should use.",
+      "resource": "Ingress/legacy-web (legacy)",
+      "ruleId": "ingress-without-tls",
+      "severity": "medium",
+      "title": "Ingress does not configure TLS",
+      "yamlPath": "spec.tls",
+    },
+    {
+      "category": "best-practice",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "metadata:
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/component: api # adjust to web, worker, db, etc.
+    app.kubernetes.io/part-of: platform-name
+    app.kubernetes.io/managed-by: gitops-or-helm",
+        "safeToAutoApply": false,
+        "title": "Add the recommended app.kubernetes.io labels with real values for this resource.",
+        "type": "yaml-snippet",
+        "yamlPath": "metadata.labels",
+      },
+      "message": "Ingress "legacy-web" is missing recommended app labels: app.kubernetes.io/name, app.kubernetes.io/instance, app.kubernetes.io/component, app.kubernetes.io/part-of, app.kubernetes.io/managed-by.",
+      "recommendation": "Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager.",
+      "resource": "Ingress/legacy-web (legacy)",
+      "ruleId": "missing-recommended-app-labels",
+      "severity": "medium",
+      "title": "Missing recommended app labels",
+      "yamlPath": "metadata.labels",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.allowPrivilegeEscalation",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not set allowPrivilegeEscalation: false.",
+      "recommendation": "Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "allow-privilege-escalation",
+      "severity": "low",
+      "title": "allowPrivilegeEscalation should be false",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.allowPrivilegeEscalation",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.capabilities",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not drop all capabilities before adding exceptions.",
+      "recommendation": "Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "capabilities-not-dropping-all",
+      "severity": "low",
+      "title": "Capabilities should drop ALL by default",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.capabilities",
+    },
+    {
+      "category": "security",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not set runAsNonRoot or runAsUser, so the image could still start as root by default.",
+      "recommendation": "Set runAsNonRoot: true explicitly and, when needed, choose a reviewed non-zero UID for the container.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "container-may-run-as-root-by-default",
+      "severity": "low",
+      "title": "Container may run as root by default",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.readOnlyRootFilesystem",
+      },
+      "message": "Container "sync" in CronJob "nightly-legacy-sync" does not set readOnlyRootFilesystem: true.",
+      "recommendation": "Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "read-only-root-filesystem",
+      "severity": "low",
+      "title": "readOnlyRootFilesystem should be true",
+      "yamlPath": "spec.jobTemplate.spec.template.spec.containers[name=sync].securityContext.readOnlyRootFilesystem",
+    },
+    {
+      "category": "operations",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "metadata:
+  labels:
+    team: platform-team
+  annotations:
+    owner: platform-team",
+        "safeToAutoApply": false,
+        "title": "Attach simple owner/team metadata so responders can find the responsible team quickly.",
+        "type": "yaml-snippet",
+        "yamlPath": "metadata.annotations",
+      },
+      "message": "Ingress "legacy-web" does not include obvious owner or team labels/annotations.",
+      "recommendation": "Add a team label and owner annotation that match how your organization routes operational responsibility.",
+      "resource": "Ingress/legacy-web (legacy)",
+      "ruleId": "missing-owner-team-annotations",
+      "severity": "low",
+      "title": "Missing owner or team metadata",
+      "yamlPath": "metadata.annotations",
+    },
+    {
+      "category": "operations",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "metadata:
+  labels:
+    team: platform-team
+  annotations:
+    owner: platform-team",
+        "safeToAutoApply": false,
+        "title": "Attach simple owner/team metadata so responders can find the responsible team quickly.",
+        "type": "yaml-snippet",
+        "yamlPath": "metadata.annotations",
+      },
+      "message": "Service "legacy-web" does not include obvious owner or team labels/annotations.",
+      "recommendation": "Add a team label and owner annotation that match how your organization routes operational responsibility.",
+      "resource": "Service/legacy-web (legacy)",
+      "ruleId": "missing-owner-team-annotations",
+      "severity": "low",
+      "title": "Missing owner or team metadata",
+      "yamlPath": "metadata.annotations",
+    },
+    {
+      "category": "best-practice",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "metadata:
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/component: api # adjust to web, worker, db, etc.
+    app.kubernetes.io/part-of: platform-name
+    app.kubernetes.io/managed-by: gitops-or-helm",
+        "safeToAutoApply": false,
+        "title": "Add the recommended app.kubernetes.io labels with real values for this resource.",
+        "type": "yaml-snippet",
+        "yamlPath": "metadata.labels",
+      },
+      "message": "Service "legacy-web" is missing recommended app labels: app.kubernetes.io/component, app.kubernetes.io/part-of, app.kubernetes.io/managed-by.",
+      "recommendation": "Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager.",
+      "resource": "Service/legacy-web (legacy)",
+      "ruleId": "missing-recommended-app-labels",
+      "severity": "low",
+      "title": "Missing recommended app labels",
+      "yamlPath": "metadata.labels",
+    },
+  ],
+  "fixFirstFindings": [
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "instructions": "PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook.",
+        "preview": {
+          "after": undefined,
+          "before": "apiVersion: policy/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Review the deprecated API migration path",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "PodSecurityPolicy "legacy-psp" uses policy/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "PodSecurityPolicy was removed; migrate to Pod Security Admission or a reviewed third-party admission webhook.",
+      "resource": "PodSecurityPolicy/legacy-psp",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: batch/v1",
+        "instructions": "Update apiVersion to batch/v1, then review any schema changes before applying the manifest.",
+        "preview": {
+          "after": "apiVersion: batch/v1",
+          "before": "apiVersion: batch/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Plan a migration to batch/v1",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "CronJob "nightly-legacy-sync" uses batch/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "Update this manifest to a served API version before relying on a cluster upgrade. Migrate to batch/v1, available since v1.21.",
+      "resource": "CronJob/nightly-legacy-sync (legacy)",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+    {
+      "category": "api-version",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: networking.k8s.io/v1",
+        "instructions": "Update apiVersion to networking.k8s.io/v1, then review any schema changes before applying the manifest. Ingress v1 renames backend fields and requires pathType on each path.",
+        "preview": {
+          "after": "apiVersion: networking.k8s.io/v1",
+          "before": "apiVersion: networking.k8s.io/v1beta1",
+        },
+        "safeToAutoApply": false,
+        "title": "Plan a migration to networking.k8s.io/v1",
+        "type": "manual-instruction",
+        "yamlPath": "apiVersion",
+      },
+      "message": "Ingress "legacy-web" uses networking.k8s.io/v1beta1, which is not served in the selected Kubernetes target version 1.25.",
+      "recommendation": "Ingress v1 renames backend fields and requires pathType on each path. Migrate to networking.k8s.io/v1, available since v1.19.",
+      "resource": "Ingress/legacy-web (legacy)",
+      "ruleId": "deprecated-api-version",
+      "severity": "high",
+      "title": "Deprecated or removed API version",
+      "yamlPath": "apiVersion",
+    },
+  ],
+  "headline": "Not production ready: high-risk issues need review",
+  "message": "Analysis completed successfully.",
+  "nextSteps": "Fix first: Deprecated or removed API version; Deprecated or removed API version; Deprecated or removed API version. After those are resolved, review the lower-severity findings before shipping.",
+  "ok": true,
+  "options": {
+    "includeInfoFindings": false,
+    "kubernetesTargetVersion": "1.25",
+    "namespaceFilter": undefined,
+    "profile": "balanced",
+    "strictSecurity": false,
+  },
+  "parseIssues": [],
+  "positiveChecks": [
+    {
+      "id": "readiness-probes-present",
+      "summary": "Readiness probes are present on the long-running application containers in this manifest set.",
+      "title": "Readiness probes present",
+    },
+    {
+      "id": "pdb-present",
+      "summary": "A matching PodDisruptionBudget is present for the multi-replica Deployment and StatefulSet workloads in this manifest set.",
+      "title": "PDB present",
+    },
+  ],
+  "privacy": {
+    "detectedKinds": [],
+    "sensitiveDataDetected": false,
+    "signalCount": 0,
+    "signals": [],
+    "warningText": "Visible exports still exclude raw YAML by default, but this report did not detect obvious Secret values, sensitive env literals, or risky annotations.",
+    "warningTitle": "No obvious sensitive manifest values detected",
+  },
+  "profile": "balanced",
+  "readinessGrade": "Not production ready",
+  "readinessScore": 29,
+  "relationshipIssues": [],
+  "resourceCounts": {
+    "byKind": {
+      "CronJob": 1,
+      "Deployment": 1,
+      "Ingress": 1,
+      "NetworkPolicy": 1,
+      "PodDisruptionBudget": 1,
+      "Service": 1,
+      "ServiceAccount": 1,
+    },
+    "total": 7,
+  },
+  "resourceSummary": {
+    "ingressesFound": 1,
+    "namespacesFound": [
+      "legacy",
+    ],
+    "networkPoliciesFound": 1,
+    "pdbsFound": 1,
+    "servicesFound": 1,
+    "totalObjects": 8,
+    "workloadsFound": 2,
+  },
+  "riskLevel": "critical",
+  "severityCounts": {
+    "critical": 0,
+    "high": 5,
+    "info": 0,
+    "low": 7,
+    "medium": 6,
+  },
+  "state": "ready",
+  "summary": "Score 29/100 after reviewing 8 objects across 1 namespace. 5 blocking issues and 13 additional warnings were found. Positive checks noted: readiness probes present; pdb present.",
+}
+`;
+
+exports[`Kubernetes golden report snapshots > keeps the security-focused sample stable 1`] = `
+{
+  "analysisMetadata": {
+    "analyzeMs": "<timing>",
+    "documentCount": 1,
+    "inputBytes": 1677,
+    "parseMs": "<timing>",
+    "totalMs": "<timing>",
+  },
+  "canShareReportSafely": true,
+  "categoryCounts": {
+    "api-version": 0,
+    "best-practice": 0,
+    "cost": 0,
+    "networking": 1,
+    "operations": 0,
+    "reliability": 1,
+    "scalability": 0,
+    "schema": 0,
+    "security": 12,
+  },
+  "categoryScores": {
+    "api-version": 100,
+    "networking": 92,
+    "operations": 100,
+    "reliability": 93,
+    "security": 0,
+  },
+  "findings": [
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities.add",
+      },
+      "message": "Container "runner" in Deployment "build-runner" adds dangerous capabilities: SYS_ADMIN and NET_ADMIN.",
+      "recommendation": "Remove dangerous capabilities unless they are tightly justified and documented, and pair any exception with compensating controls.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "dangerous-capabilities-added",
+      "severity": "high",
+      "title": "Dangerous Linux capabilities added",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities.add",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "hostNetwork: false
+hostPID: false
+hostIPC: false",
+        "safeToAutoApply": false,
+        "title": "Turn off host namespace sharing flags.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec",
+      },
+      "message": "Deployment "build-runner" enables hostNetwork.",
+      "recommendation": "Disable host namespace sharing unless the workload has a reviewed operational reason that truly requires it.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "host-namespace-sharing",
+      "severity": "high",
+      "title": "Host namespace sharing enabled",
+      "yamlPath": "spec.template.spec",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Prefer a safer volume type when possible:
+volumes:
+  - name: docker-sock
+    emptyDir: {}
+# or use a PersistentVolumeClaim / ConfigMap / Secret as appropriate",
+        "safeToAutoApply": false,
+        "title": "Replace hostPath with a safer volume type when the workload does not need node filesystem access.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.volumes[name=docker-sock]",
+      },
+      "message": "Deployment "build-runner" mounts hostPath "/var/run/docker.sock" through volume "docker-sock".",
+      "recommendation": "Review whether hostPath is truly required. Prefer PVCs, emptyDir, ConfigMaps, or Secrets where possible, and document any remaining hostPath use as a reviewed exception.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "hostpath-volume-usage",
+      "severity": "high",
+      "title": "hostPath volume needs careful review",
+      "yamlPath": "spec.template.spec.volumes[name=docker-sock].hostPath",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.privileged",
+      },
+      "message": "Container "runner" in Deployment "build-runner" sets securityContext.privileged: true.",
+      "recommendation": "Avoid privileged mode unless the workload truly requires host-level access. Start from a hardened securityContext and add only the minimum capabilities the app needs.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "privileged-container",
+      "severity": "high",
+      "title": "Privileged container",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.privileged",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.runAsUser",
+      },
+      "message": "Container "runner" in Deployment "build-runner" sets runAsUser: 0.",
+      "recommendation": "Set a non-zero runAsUser that matches the image's permissions and keep runAsNonRoot: true.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "run-as-user-root",
+      "severity": "high",
+      "title": "runAsUser is set to root",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.runAsUser",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.allowPrivilegeEscalation",
+      },
+      "message": "Container "runner" in Deployment "build-runner" allows privilege escalation.",
+      "recommendation": "Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "allow-privilege-escalation",
+      "severity": "medium",
+      "title": "allowPrivilegeEscalation should be false",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.allowPrivilegeEscalation",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.securityContext.seccompProfile",
+      },
+      "message": "Container "runner" in Deployment "build-runner" does not set a seccomp profile.",
+      "recommendation": "Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "missing-seccomp-profile",
+      "severity": "medium",
+      "title": "Missing seccomp profile",
+      "yamlPath": "spec.template.spec.securityContext.seccompProfile",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.securityContext.runAsNonRoot",
+      },
+      "message": "Container "runner" in Deployment "build-runner" does not set runAsNonRoot: true at the pod or container level.",
+      "recommendation": "Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "run-as-non-root",
+      "severity": "medium",
+      "title": "runAsNonRoot should be true",
+      "yamlPath": "spec.template.spec.securityContext.runAsNonRoot",
+    },
+    {
+      "category": "reliability",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# New resource suggestion: confirm the selector and disruption budget match your rollout and maintenance behavior.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: build-runner-pdb
+  namespace: platform
+spec:
+  minAvailable: 1",
+        "safeToAutoApply": false,
+        "title": "Create a PodDisruptionBudget for build-runner",
+        "type": "new-resource",
+        "yamlPath": "spec",
+      },
+      "message": "Deployment "build-runner" has 2 replicas but no matching PodDisruptionBudget.",
+      "recommendation": "Add a PodDisruptionBudget that matches this workload's labels and still permits at least one pod of temporary unavailability during voluntary disruptions.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "missing-pod-disruption-budget",
+      "severity": "low",
+      "title": "Missing PodDisruptionBudget",
+      "yamlPath": "spec",
+    },
+    {
+      "category": "security",
+      "confidence": "medium",
+      "fix": {
+        "copyableContentPreview": "automountServiceAccountToken: false",
+        "safeToAutoApply": false,
+        "title": "Disable automatic service account token mounting for app workloads that do not need cluster API access.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.automountServiceAccountToken",
+      },
+      "message": "Deployment "build-runner" does not set automountServiceAccountToken: false.",
+      "recommendation": "Set automountServiceAccountToken: false unless the workload has a reviewed reason to call the Kubernetes API.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "automount-service-account-token",
+      "severity": "low",
+      "title": "automountServiceAccountToken should usually be false",
+      "yamlPath": "spec.template.spec.automountServiceAccountToken",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities",
+      },
+      "message": "Container "runner" in Deployment "build-runner" does not drop all capabilities before adding exceptions.",
+      "recommendation": "Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "capabilities-not-dropping-all",
+      "severity": "low",
+      "title": "Capabilities should drop ALL by default",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "serviceAccountName: app-sa
+automountServiceAccountToken: false",
+        "safeToAutoApply": false,
+        "title": "Move the workload off the default ServiceAccount and disable token mounting if the API is unnecessary.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec",
+      },
+      "message": "Deployment "build-runner" uses the default ServiceAccount with its token mount still enabled.",
+      "recommendation": "Use a dedicated ServiceAccount for workloads that need cluster API access, and disable token mounting when they do not.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "default-serviceaccount-usage",
+      "severity": "low",
+      "title": "Production workload uses the default ServiceAccount",
+      "yamlPath": "spec.template.spec.serviceAccountName",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.readOnlyRootFilesystem",
+      },
+      "message": "Container "runner" in Deployment "build-runner" does not set readOnlyRootFilesystem: true.",
+      "recommendation": "Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "read-only-root-filesystem",
+      "severity": "low",
+      "title": "readOnlyRootFilesystem should be true",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.readOnlyRootFilesystem",
+    },
+    {
+      "category": "networking",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: platform
+spec:
+  podSelector: {}
+  policyTypes:",
+        "safeToAutoApply": false,
+        "title": "Start with a minimal default-deny policy and stage explicit allow rules carefully.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec",
+      },
+      "message": "Namespace "platform" has application workloads but no NetworkPolicy resources in the manifest set.",
+      "recommendation": "Add at least a reviewed baseline NetworkPolicy for this namespace. A default-deny policy is a careful rollout item that usually needs explicit allow rules alongside it.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "networkpolicy-absent-for-namespace",
+      "severity": "low",
+      "title": "Namespace has no NetworkPolicy",
+      "yamlPath": "spec",
+    },
+  ],
+  "fixFirstFindings": [
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Pod-level hardening: use this when every container can inherit the same safer defaults.
+securityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level hardening: review writable paths, volume mounts, and image UID expectations before applying this block.
+securityContext:",
+        "safeToAutoApply": false,
+        "title": "Add a reviewed securityContext baseline",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities.add",
+      },
+      "message": "Container "runner" in Deployment "build-runner" adds dangerous capabilities: SYS_ADMIN and NET_ADMIN.",
+      "recommendation": "Remove dangerous capabilities unless they are tightly justified and documented, and pair any exception with compensating controls.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "dangerous-capabilities-added",
+      "severity": "high",
+      "title": "Dangerous Linux capabilities added",
+      "yamlPath": "spec.template.spec.containers[name=runner].securityContext.capabilities.add",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "hostNetwork: false
+hostPID: false
+hostIPC: false",
+        "safeToAutoApply": false,
+        "title": "Turn off host namespace sharing flags.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec",
+      },
+      "message": "Deployment "build-runner" enables hostNetwork.",
+      "recommendation": "Disable host namespace sharing unless the workload has a reviewed operational reason that truly requires it.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "host-namespace-sharing",
+      "severity": "high",
+      "title": "Host namespace sharing enabled",
+      "yamlPath": "spec.template.spec",
+    },
+    {
+      "category": "security",
+      "confidence": "high",
+      "fix": {
+        "copyableContentPreview": "# Prefer a safer volume type when possible:
+volumes:
+  - name: docker-sock
+    emptyDir: {}
+# or use a PersistentVolumeClaim / ConfigMap / Secret as appropriate",
+        "safeToAutoApply": false,
+        "title": "Replace hostPath with a safer volume type when the workload does not need node filesystem access.",
+        "type": "yaml-snippet",
+        "yamlPath": "spec.template.spec.volumes[name=docker-sock]",
+      },
+      "message": "Deployment "build-runner" mounts hostPath "/var/run/docker.sock" through volume "docker-sock".",
+      "recommendation": "Review whether hostPath is truly required. Prefer PVCs, emptyDir, ConfigMaps, or Secrets where possible, and document any remaining hostPath use as a reviewed exception.",
+      "resource": "Deployment/build-runner (platform)",
+      "ruleId": "hostpath-volume-usage",
+      "severity": "high",
+      "title": "hostPath volume needs careful review",
+      "yamlPath": "spec.template.spec.volumes[name=docker-sock].hostPath",
+    },
+  ],
+  "headline": "Needs production fixes: high-risk issues need review",
+  "message": "Analysis completed successfully.",
+  "nextSteps": "Fix first: Dangerous Linux capabilities added; Host namespace sharing enabled; hostPath volume needs careful review. After those are resolved, review the lower-severity findings before shipping.",
+  "ok": true,
+  "options": {
+    "includeInfoFindings": false,
+    "kubernetesTargetVersion": undefined,
+    "namespaceFilter": undefined,
+    "profile": "balanced",
+    "strictSecurity": false,
+  },
+  "parseIssues": [],
+  "positiveChecks": [
+    {
+      "id": "readiness-probes-present",
+      "summary": "Readiness probes are present on the long-running application containers in this manifest set.",
+      "title": "Readiness probes present",
+    },
+    {
+      "id": "resources-configured",
+      "summary": "CPU and memory requests are set, and memory limits are present for the reviewed workload containers.",
+      "title": "Resources configured",
+    },
+  ],
+  "privacy": {
+    "detectedKinds": [],
+    "sensitiveDataDetected": false,
+    "signalCount": 0,
+    "signals": [],
+    "warningText": "Visible exports still exclude raw YAML by default, but this report did not detect obvious Secret values, sensitive env literals, or risky annotations.",
+    "warningTitle": "No obvious sensitive manifest values detected",
+  },
+  "profile": "balanced",
+  "readinessGrade": "Needs production fixes",
+  "readinessScore": 68,
+  "relationshipIssues": [],
+  "resourceCounts": {
+    "byKind": {
+      "Deployment": 1,
+    },
+    "total": 1,
+  },
+  "resourceSummary": {
+    "ingressesFound": 0,
+    "namespacesFound": [
+      "platform",
+    ],
+    "networkPoliciesFound": 0,
+    "pdbsFound": 0,
+    "servicesFound": 0,
+    "totalObjects": 1,
+    "workloadsFound": 1,
+  },
+  "riskLevel": "high",
+  "severityCounts": {
+    "critical": 0,
+    "high": 5,
+    "info": 0,
+    "low": 6,
+    "medium": 3,
+  },
+  "state": "ready",
+  "summary": "Score 68/100 after reviewing 1 object across 1 namespace. 5 blocking issues and 9 additional warnings were found. Positive checks noted: readiness probes present; resources configured.",
+}
+`;

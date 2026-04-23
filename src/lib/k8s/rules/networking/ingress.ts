@@ -9,7 +9,6 @@ import {
   getIngressHosts,
   ingressHasTls,
   isStrictOrSecurityProfile,
-  toRecord,
 } from "@/lib/k8s/rules/networking/shared";
 
 export const ingressWithoutTlsRule: K8sRule = {
@@ -39,7 +38,8 @@ export const ingressWithoutTlsRule: K8sRule = {
           recommendation:
             "Add a TLS block for the intended hosts and bind it to the certificate secret your ingress controller should use.",
           fix: {
-            summary: "Add an Ingress TLS block for the real host and certificate secret.",
+            summary:
+              "Add an Ingress TLS block for the real host and certificate secret.",
             yamlPath: "spec.tls",
             snippet: buildIngressTlsSnippet(),
           },

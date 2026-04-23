@@ -1,11 +1,9 @@
 import { createFinding } from "@/lib/k8s/findings";
-import { matchesLabelSelector } from "@/lib/k8s/selectors";
 import type {
   K8sExtractedResource,
   K8sFinding,
   K8sFindingLocation,
   K8sFixSuggestionInput,
-  K8sIngressResource,
   K8sLabelSelector,
   K8sManifestDocument,
   K8sNetworkPolicyResource,
@@ -166,21 +164,27 @@ export function getServiceType(
   context: K8sRuleContext,
   service: K8sServiceResource,
 ) {
-  return toNonEmptyString(getServiceSpec(context, service)?.type) ?? "ClusterIP";
+  return (
+    toNonEmptyString(getServiceSpec(context, service)?.type) ?? "ClusterIP"
+  );
 }
 
 export function getNamespaceNetworkPolicies(
   context: K8sRuleContext,
   namespace: string,
 ) {
-  return context.networkPolicies.filter((policy) => policy.namespace === namespace);
+  return context.networkPolicies.filter(
+    (policy) => policy.namespace === namespace,
+  );
 }
 
 export function getNamespaceWorkloads(
   context: K8sRuleContext,
   namespace: string,
 ) {
-  return getAppWorkloads(context).filter((workload) => workload.namespace === namespace);
+  return getAppWorkloads(context).filter(
+    (workload) => workload.namespace === namespace,
+  );
 }
 
 export function createResourceFinding(
@@ -217,8 +221,9 @@ export function createDocumentFinding(
     severity: input.severity,
     category: input.category,
     resourceRef:
-      context.resources.find((resource) => resource.documentIndex === document.index)
-        ?.ref ?? document.objectRef,
+      context.resources.find(
+        (resource) => resource.documentIndex === document.index,
+      )?.ref ?? document.objectRef,
     location: getFindingLocation(context, document.index, input.path),
     whyItMatters: input.whyItMatters,
     recommendation: input.recommendation,
@@ -328,12 +333,13 @@ export function getWorkloadPortNumbers(workload: K8sWorkloadResource) {
 }
 
 export function workloadHasDeclaredPorts(workload: K8sWorkloadResource) {
-  return getWorkloadPortNumbers(workload).size > 0 || getWorkloadPortNames(workload).size > 0;
+  return (
+    getWorkloadPortNumbers(workload).size > 0 ||
+    getWorkloadPortNames(workload).size > 0
+  );
 }
 
-export function getServiceIdentity(
-  workload: K8sWorkloadResource,
-) {
+export function getServiceIdentity(workload: K8sWorkloadResource) {
   for (const key of [
     "app.kubernetes.io/name",
     "app",
@@ -388,7 +394,9 @@ export function buildSelectorMismatchSnippet(
     "",
     `# Current selector: ${selectorToString(selector)}`,
     "# Candidate workloads in the same namespace:",
-    ...candidates.slice(0, 3).map((workload) => `# - ${formatWorkloadSummary(workload)}`),
+    ...candidates
+      .slice(0, 3)
+      .map((workload) => `# - ${formatWorkloadSummary(workload)}`),
   ].join("\n");
 }
 
@@ -428,7 +436,9 @@ export function hasInternalLoadBalancerIndicator(service: K8sServiceResource) {
     const normalizedValue = value.toLowerCase();
 
     if (normalizedKey.includes("internal")) {
-      return ["true", "1", "yes", "internal", "private"].includes(normalizedValue);
+      return ["true", "1", "yes", "internal", "private"].includes(
+        normalizedValue,
+      );
     }
 
     return (
@@ -438,7 +448,10 @@ export function hasInternalLoadBalancerIndicator(service: K8sServiceResource) {
   });
 }
 
-export function getExternalName(context: K8sRuleContext, service: K8sServiceResource) {
+export function getExternalName(
+  context: K8sRuleContext,
+  service: K8sServiceResource,
+) {
   return toNonEmptyString(getServiceSpec(context, service)?.externalName);
 }
 
@@ -524,7 +537,9 @@ export function isDefaultDenyPolicy(
     return { ingress: false, egress: false };
   }
 
-  const policyTypes = arrayOfStrings(spec?.policyTypes).map((value) => value.toLowerCase());
+  const policyTypes = arrayOfStrings(spec?.policyTypes).map((value) =>
+    value.toLowerCase(),
+  );
   const ingressRules = Array.isArray(spec?.ingress) ? spec.ingress : undefined;
   const egressRules = Array.isArray(spec?.egress) ? spec.egress : undefined;
 
@@ -618,7 +633,9 @@ function getContainerRecords(workload: K8sWorkloadResource) {
   });
 }
 
-function getIngressServiceReference(value: Record<string, unknown> | undefined) {
+function getIngressServiceReference(
+  value: Record<string, unknown> | undefined,
+) {
   const nestedService = toRecord(value?.service);
 
   if (nestedService) {
@@ -632,7 +649,8 @@ function getIngressServiceReference(value: Record<string, unknown> | undefined) 
 
   return {
     serviceName: toNonEmptyString(value?.serviceName),
-    servicePort: toNumber(value?.servicePort) ?? toNonEmptyString(value?.servicePort),
+    servicePort:
+      toNumber(value?.servicePort) ?? toNonEmptyString(value?.servicePort),
   };
 }
 

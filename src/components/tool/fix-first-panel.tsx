@@ -1,4 +1,6 @@
 import type { K8sFinding } from "@/lib/k8s/types";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import { formatK8sResourceLabel } from "@/components/tool/k8s-dashboard-helpers";
 import { CopyButton } from "@/components/tool/copy-button";
 import { SeverityBadge } from "@/components/tool/severity-badge";
@@ -14,12 +16,14 @@ type FixFirstPanelProps = {
   findings: readonly K8sFinding[];
   title?: string;
   description?: string;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
 export function FixFirstPanel({
   findings,
   title = "Fix first",
   description = "Start with the most important issues from the current report before polishing lower-severity warnings.",
+  analyticsPayload,
 }: FixFirstPanelProps) {
   return (
     <Card>
@@ -54,6 +58,9 @@ export function FixFirstPanel({
                       value={fixCopyValue}
                       ariaLabel="Copy fix-first recommendation"
                       showInlineFeedback
+                      onCopySuccess={() =>
+                        trackAnalyticsEvent("fix_copied", analyticsPayload)
+                      }
                     />
                   ) : null}
                 </div>

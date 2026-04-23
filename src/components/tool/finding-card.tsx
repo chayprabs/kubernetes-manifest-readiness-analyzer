@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
 import type { K8sFinding } from "@/lib/k8s/types";
 import { buildFixCopyValue } from "@/lib/k8s/fix-checklist";
 import {
@@ -18,9 +19,14 @@ import { Separator } from "@/components/ui/separator";
 type FindingCardProps = {
   finding: K8sFinding;
   compact?: boolean;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
-export function FindingCard({ finding, compact = false }: FindingCardProps) {
+export function FindingCard({
+  finding,
+  compact = false,
+  analyticsPayload,
+}: FindingCardProps) {
   const fixCopyValue = finding.fix ? buildFixCopyValue(finding) : undefined;
   const copyValue = [
     `Title: ${finding.title}`,
@@ -76,7 +82,11 @@ export function FindingCard({ finding, compact = false }: FindingCardProps) {
         <DetailBlock label="Recommendation" text={finding.recommendation} />
 
         {finding.fix ? (
-          <FixSuggestionCard finding={finding} compact={compact} />
+          <FixSuggestionCard
+            finding={finding}
+            compact={compact}
+            analyticsPayload={analyticsPayload}
+          />
         ) : null}
 
         <div className="flex flex-wrap items-center gap-2">

@@ -1,10 +1,9 @@
-import type { K8sManifestDocument, K8sRule } from "@/lib/k8s/types";
+import type { K8sRule } from "@/lib/k8s/types";
 import {
   buildDefaultDenySnippet,
   createDocumentFinding,
   createResourceFinding,
   formatHumanList,
-  getDocumentForResource,
   getMatchedWorkloadsForNetworkPolicy,
   getNamespaceNetworkPolicies,
   getNamespaceWorkloads,
@@ -22,7 +21,9 @@ export const networkPolicyAbsentForNamespaceRule: K8sRule = {
   defaultSeverity: "low",
   run(context) {
     const namespaces = new Set(
-      getNamespacesWithAppWorkloads(context).filter((value) => value !== undefined),
+      getNamespacesWithAppWorkloads(context).filter(
+        (value) => value !== undefined,
+      ),
     );
 
     return [...namespaces].flatMap((namespace) => {
@@ -174,12 +175,13 @@ export const defaultDenyNetworkPolicyDetectedRule: K8sRule = {
 
 function getNamespacesWithAppWorkloads(context: Parameters<K8sRule["run"]>[0]) {
   return context.workloads
-    .filter((workload) =>
-      workload.kind === "Pod" ||
-      workload.kind === "Deployment" ||
-      workload.kind === "StatefulSet" ||
-      workload.kind === "DaemonSet" ||
-      workload.kind === "ReplicaSet",
+    .filter(
+      (workload) =>
+        workload.kind === "Pod" ||
+        workload.kind === "Deployment" ||
+        workload.kind === "StatefulSet" ||
+        workload.kind === "DaemonSet" ||
+        workload.kind === "ReplicaSet",
     )
     .map((workload) => workload.namespace);
 }

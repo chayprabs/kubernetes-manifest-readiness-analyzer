@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { AnalyticsEventPayloadInput } from "@/lib/analytics/events";
+import { trackAnalyticsEvent } from "@/lib/analytics/client";
 import type { K8sFinding } from "@/lib/k8s/types";
 import {
   buildFixBuckets,
@@ -29,9 +31,14 @@ import { formatFindingCount } from "@/lib/utils";
 type FixesTabProps = {
   findings: readonly K8sFinding[];
   totalFixCount: number;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 };
 
-export function FixesTab({ findings, totalFixCount }: FixesTabProps) {
+export function FixesTab({
+  findings,
+  totalFixCount,
+  analyticsPayload,
+}: FixesTabProps) {
   const [safeCopyBucket, manualReviewBucket] = buildFixBuckets(findings);
   const safeCopyBundle = buildSafeCopyFixBundle(findings);
 
@@ -73,6 +80,7 @@ export function FixesTab({ findings, totalFixCount }: FixesTabProps) {
         bucket={safeCopyBucket}
         title="Safe copy snippets"
         description="Copyable suggested patches and templates appear here first. Copying is safe; applying still needs review in your own manifest context."
+        analyticsPayload={analyticsPayload}
         action={
           safeCopyBundle ? (
             <CopyButton
@@ -81,6 +89,9 @@ export function FixesTab({ findings, totalFixCount }: FixesTabProps) {
               copiedLabel="Copied all safe snippets"
               showText
               showInlineFeedback
+              onCopySuccess={() =>
+                trackAnalyticsEvent("fix_copied", analyticsPayload)
+              }
             />
           ) : null
         }
@@ -92,6 +103,7 @@ export function FixesTab({ findings, totalFixCount }: FixesTabProps) {
         bucket={manualReviewBucket}
         title="Manual review required"
         description="These fixes still need a human to choose the exact manifest change, even if the analyzer can explain the intent."
+        analyticsPayload={analyticsPayload}
         emptyTitle="No manual-review-only fixes in this view"
         emptyDescription="Every visible fix currently includes a copyable template or suggested patch."
       />
@@ -106,6 +118,7 @@ function BucketSection({
   action,
   emptyTitle,
   emptyDescription,
+  analyticsPayload,
 }: {
   bucket: K8sFixBucket;
   title: string;
@@ -113,6 +126,7 @@ function BucketSection({
   action?: ReactNode;
   emptyTitle: string;
   emptyDescription: string;
+  analyticsPayload?: AnalyticsEventPayloadInput | undefined;
 }) {
   return (
     <Card>
@@ -170,6 +184,7 @@ function BucketSection({
                         key={finding.id}
                         finding={finding}
                         showFindingContext
+                        analyticsPayload={analyticsPayload}
                       />
                     ))}
                   </div>

@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly-ledger-sync
+  namespace: ops
+  labels:
+    app.kubernetes.io/name: nightly-ledger-sync
+    app.kubernetes.io/component: batch
+    app.kubernetes.io/part-of: finance
+    app.kubernetes.io/managed-by: authos
+    team: ops
+  annotations:
+    owner: ops
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: sync
+              image: ghcr.io/example/ledger-sync:1.7.0
+              args:
+                - /bin/sh
+                - -c
+                - sync-ledger.sh

@@ -14,7 +14,7 @@ export const siteConfig = {
   name: "Authos",
   shortTagline: "Browser-first developer tools",
   mission:
-    "A clean foundation for browser-first developer tools that can scale into a multi-tool website.",
+    "Browser-first tools that help engineering teams review risky changes before they ship.",
   description:
     "Authos builds browser-first developer tools for practical engineering workflows, starting with local Kubernetes manifest analysis and remediation guidance.",
   baseUrl: normalizeBaseUrl(

@@ -29,8 +29,8 @@ export type K8sApiDeprecationRecord = {
 const deprecationGuideUrl =
   "https://kubernetes.io/docs/reference/using-api/deprecation-guide/";
 
-// TODO(authos): verify each replacement availability version against the official
-// migration guide before broad launch if we expand this table significantly.
+// Keep this table aligned with the official Kubernetes deprecation guide as
+// supported target versions move forward.
 export const kubernetesApiDeprecations: readonly K8sApiDeprecationRecord[] = [
   {
     kind: "CronJob",

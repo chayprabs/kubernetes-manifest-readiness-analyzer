@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ManifestAnalyzerShell } from "@/components/tool/manifest-analyzer-shell";
+import { K8sAnalyzerApp } from "@/components/tool/k8s-analyzer-app";
 import { getToolMetadata } from "@/lib/tools/registry";
 
 export const metadata: Metadata = getToolMetadata(
@@ -7,5 +7,5 @@ export const metadata: Metadata = getToolMetadata(
 );
 
 export default function KubernetesManifestAnalyzerPage() {
-  return <ManifestAnalyzerShell />;
+  return <K8sAnalyzerApp />;
 }

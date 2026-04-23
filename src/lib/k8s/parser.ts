@@ -30,6 +30,7 @@ export function parseK8sYaml(rawInput: string): K8sParseResult {
   const errors: K8sParseError[] = [];
   const warnings: K8sParseError[] = [];
   const emptyDocuments: K8sEmptyDocument[] = [];
+  let parsedDocumentCount = 0;
 
   if (sizeBytes > RECOMMENDED_MAX_PASTE_BYTES) {
     warnings.push(createInputTooLargeWarning(sizeBytes));
@@ -40,6 +41,7 @@ export function parseK8sYaml(rawInput: string): K8sParseResult {
       ...YAML_PARSE_OPTIONS,
       lineCounter,
     });
+    parsedDocumentCount = yamlDocuments.length;
 
     yamlDocuments.forEach((document, documentIndex) => {
       if (document.errors.length > 0) {
@@ -103,6 +105,7 @@ export function parseK8sYaml(rawInput: string): K8sParseResult {
       raw: source,
       sizeBytes,
       recommendedMaxBytes: RECOMMENDED_MAX_PASTE_BYTES,
+      documentCount: parsedDocumentCount,
       documents,
       emptyDocumentCount: emptyDocuments.length,
     },

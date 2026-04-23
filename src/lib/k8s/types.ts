@@ -121,6 +121,7 @@ export type K8sAnalysisInput = {
   raw: string;
   sizeBytes: number;
   recommendedMaxBytes: number;
+  documentCount: number;
   documents: K8sManifestDocument[];
   emptyDocumentCount: number;
 };
@@ -176,12 +177,11 @@ export type K8sYamlSnippetFixSuggestion = K8sFixSuggestionBase & {
   copyableContent: string;
 };
 
-export type K8sStrategicMergePatchLikeFixSuggestion =
-  K8sFixSuggestionBase & {
-    type: "strategic-merge-patch-like";
-    targetRef: Pick<K8sObjectRef, "apiVersion" | "kind" | "name" | "namespace">;
-    copyableContent: string;
-  };
+export type K8sStrategicMergePatchLikeFixSuggestion = K8sFixSuggestionBase & {
+  type: "strategic-merge-patch-like";
+  targetRef: Pick<K8sObjectRef, "apiVersion" | "kind" | "name" | "namespace">;
+  copyableContent: string;
+};
 
 export type K8sJsonPatchLikeFixSuggestion = K8sFixSuggestionBase & {
   type: "json-patch-like";
@@ -214,9 +214,7 @@ export type K8sLegacyFixSuggestion = {
   snippet?: string | undefined;
 };
 
-export type K8sFixSuggestionInput =
-  | K8sFixSuggestion
-  | K8sLegacyFixSuggestion;
+export type K8sFixSuggestionInput = K8sFixSuggestion | K8sLegacyFixSuggestion;
 
 export type K8sFinding = {
   id: string;
@@ -561,6 +559,53 @@ export type K8sResourceCounts = {
   byKind: Record<string, number>;
 };
 
+export type K8sAnalysisMetadata = {
+  parseMs: number;
+  analyzeMs: number;
+  totalMs: number;
+  documentCount: number;
+  inputBytes: number;
+};
+
+export type K8sAnalysisProgressStage =
+  | "parse"
+  | "relationships"
+  | "rules"
+  | "finalize";
+
+export type K8sAnalysisProgressUpdate = {
+  stage: K8sAnalysisProgressStage;
+  progress: number;
+  message: string;
+};
+
+export type K8sPrivacySignalKind =
+  | "secret-data"
+  | "secret-string-data"
+  | "sensitive-env-var"
+  | "sensitive-annotation"
+  | "cloud-credential"
+  | "private-key"
+  | "internal-hostname";
+
+export type K8sPrivacySignal = {
+  kind: K8sPrivacySignalKind;
+  summary: string;
+  fieldPath: string;
+  documentIndex: number;
+  resourceRef: K8sObjectRef;
+  keyName?: string;
+};
+
+export type K8sPrivacySummary = {
+  sensitiveDataDetected: boolean;
+  signalCount: number;
+  detectedKinds: K8sPrivacySignalKind[];
+  warningTitle: string;
+  warningText: string;
+  signals: K8sPrivacySignal[];
+};
+
 export type K8sAnalysisReport = {
   ok: boolean;
   state: "empty" | "invalid" | "ready";
@@ -588,4 +633,6 @@ export type K8sAnalysisReport = {
   fixFirstFindings: K8sFinding[];
   positiveChecks: K8sPositiveCheck[];
   scoreBreakdown: K8sScoreBreakdown;
+  analysisMetadata: K8sAnalysisMetadata;
+  privacy: K8sPrivacySummary;
 };

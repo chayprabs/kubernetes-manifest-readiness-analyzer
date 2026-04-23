@@ -1,11 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { FileCode2, LoaderCircle, ShieldCheck } from "lucide-react";
-import {
-  findingCategories,
-  getFindingSeverityRank,
-} from "@/lib/k8s/findings";
+import { findingCategories, getFindingSeverityRank } from "@/lib/k8s/findings";
 import type {
   K8sAnalysisReport,
   K8sExtractedResource,
@@ -15,10 +12,7 @@ import type {
   K8sRelationshipGraph,
   K8sRelationshipIssue,
 } from "@/lib/k8s/types";
-import {
-  buildResourceSummaryCopy,
-  buildSafeFixBundle,
-} from "@/lib/k8s/report-export";
+import { buildResourceSummaryCopy } from "@/lib/k8s/report-export";
 import {
   formatK8sNamespaceLabel,
   formatK8sRelationshipTypeLabel,
@@ -34,11 +28,15 @@ import {
 } from "@/components/tool/finding-filters";
 import { FindingsList } from "@/components/tool/findings-list";
 import { FixFirstPanel } from "@/components/tool/fix-first-panel";
+import { FixesTab } from "@/components/tool/fixes-tab";
 import { K8sScoreSummary } from "@/components/tool/k8s-score-summary";
 import { PositiveChecksPanel } from "@/components/tool/positive-checks-panel";
-import { ResourceSummaryTable, type ResourceSummaryRow } from "@/components/tool/resource-summary-table";
-import { SeverityBadge } from "@/components/tool/severity-badge";
+import {
+  ResourceSummaryTable,
+  type ResourceSummaryRow,
+} from "@/components/tool/resource-summary-table";
 import { SeveritySummaryCards } from "@/components/tool/severity-summary-cards";
+import { SensitiveDataWarning } from "@/components/tool/sensitive-data-warning";
 import { CategoryBreakdown } from "@/components/tool/category-breakdown";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -57,10 +55,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 type K8sResultsDashboardProps = {
   report: K8sAnalysisReport | null;
   reportJson: string;
+  redactVisibleOutput: boolean;
   hasInput: boolean;
   isAnalyzing: boolean;
   analysisMessage: string;
   stale: boolean;
+  activeTab: string;
+  onActiveTabChange: (value: string) => void;
+  focusSearchRequestKey?: number;
+  focusResultsRequestKey?: number;
+  onAnalyzeCurrentDraft?: () => void;
+  onFocusManifestInput?: () => void;
+  onLoadStarterSample?: () => void;
 };
 
 type RelationshipSection = {
@@ -83,20 +89,31 @@ type RelationshipSectionItem = {
 export function K8sResultsDashboard({
   report,
   reportJson,
+  redactVisibleOutput,
   hasInput,
   isAnalyzing,
   analysisMessage,
   stale,
+  activeTab,
+  onActiveTabChange,
+  focusSearchRequestKey = 0,
+  focusResultsRequestKey = 0,
+  onAnalyzeCurrentDraft,
+  onFocusManifestInput,
+  onLoadStarterSample,
 }: K8sResultsDashboardProps) {
   const [filters, setFilters] = useState<FindingFilterState>(
     defaultFindingFilterState,
   );
   const [rawJsonExpanded, setRawJsonExpanded] = useState(false);
+  const findingsSearchInputId = useId();
+  const resultsRegionRef = useRef<HTMLDivElement | null>(null);
+  const findingsSearchInputRef = useRef<HTMLInputElement | null>(null);
 
   const lowConfidenceCount = useMemo(
     () =>
-      report?.findings.filter((finding) => finding.confidence === "low").length ??
-      0,
+      report?.findings.filter((finding) => finding.confidence === "low")
+        .length ?? 0,
     [report],
   );
 
@@ -170,7 +187,10 @@ export function K8sResultsDashboard({
         return false;
       }
 
-      if (filters.namespace === "__cluster__" && finding.resourceRef.namespace) {
+      if (
+        filters.namespace === "__cluster__" &&
+        finding.resourceRef.namespace
+      ) {
         return false;
       }
 
@@ -219,12 +239,16 @@ export function K8sResultsDashboard({
         const rightPriority = fixFirstIds.get(right.id);
 
         if (leftPriority !== undefined || rightPriority !== undefined) {
-          return (leftPriority ?? Number.POSITIVE_INFINITY) -
-            (rightPriority ?? Number.POSITIVE_INFINITY);
+          return (
+            (leftPriority ?? Number.POSITIVE_INFINITY) -
+            (rightPriority ?? Number.POSITIVE_INFINITY)
+          );
         }
 
-        return getFindingSeverityRank(right.severity) -
-          getFindingSeverityRank(left.severity);
+        return (
+          getFindingSeverityRank(right.severity) -
+          getFindingSeverityRank(left.severity)
+        );
       });
   }, [filteredFindings, report]);
 
@@ -241,10 +265,39 @@ export function K8sResultsDashboard({
     () => buildResourceSummaryCopy(resourceRows),
     [resourceRows],
   );
-  const safeFixBundle = useMemo(
-    () => buildSafeFixBundle(fixableFindings),
-    [fixableFindings],
-  );
+
+  useEffect(() => {
+    if (!report || focusSearchRequestKey === 0) {
+      return;
+    }
+
+    const raf = window.requestAnimationFrame(() => {
+      findingsSearchInputRef.current?.focus();
+      findingsSearchInputRef.current?.select();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+    };
+  }, [focusSearchRequestKey, report]);
+
+  useEffect(() => {
+    if (!report || focusResultsRequestKey === 0) {
+      return;
+    }
+
+    const raf = window.requestAnimationFrame(() => {
+      resultsRegionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      resultsRegionRef.current?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+    };
+  }, [focusResultsRequestKey, report]);
 
   if (!report) {
     if (isAnalyzing) {
@@ -257,6 +310,24 @@ export function K8sResultsDashboard({
           title="Paste Kubernetes YAML to start."
           description="The production-readiness dashboard appears here after a local analysis run."
           icon={<FileCode2 className="h-5 w-5" />}
+          action={
+            <div className="flex flex-wrap justify-center gap-2">
+              {onFocusManifestInput ? (
+                <Button type="button" onClick={onFocusManifestInput}>
+                  Focus editor
+                </Button>
+              ) : null}
+              {onLoadStarterSample ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onLoadStarterSample}
+                >
+                  Load starter sample
+                </Button>
+              ) : null}
+            </div>
+          }
         />
       );
     }
@@ -266,6 +337,13 @@ export function K8sResultsDashboard({
         title="Draft ready for analysis"
         description="Click Analyze to generate a local production-readiness report for the current manifest draft."
         icon={<ShieldCheck className="h-5 w-5" />}
+        action={
+          onAnalyzeCurrentDraft ? (
+            <Button type="button" onClick={onAnalyzeCurrentDraft}>
+              Analyze current draft
+            </Button>
+          ) : null
+        }
       />
     );
   }
@@ -275,15 +353,15 @@ export function K8sResultsDashboard({
     ...report.parseResult.warnings,
   ];
   const allFixableFindings = report.findings.filter((finding) => finding.fix);
-  const fixesNeedingReview = allFixableFindings.filter(
-    (finding) => !finding.fix?.safeToAutoApply,
-  ).length;
-  const copyableFixes = allFixableFindings.filter(
-    (finding) => Boolean(finding.fix?.copyableContent),
-  ).length;
 
   return (
-    <div className="space-y-6">
+    <div
+      ref={resultsRegionRef}
+      className="space-y-6"
+      role="region"
+      aria-label="Analysis results"
+      tabIndex={-1}
+    >
       {stale ? (
         <Alert variant="warning">
           <AlertTitle>Results are older than the current draft</AlertTitle>
@@ -296,7 +374,9 @@ export function K8sResultsDashboard({
 
       {report.state === "invalid" ? (
         <Alert variant="destructive">
-          <AlertTitle>Fix parse blockers before trusting runtime advice</AlertTitle>
+          <AlertTitle>
+            Fix parse blockers before trusting runtime advice
+          </AlertTitle>
           <AlertDescription>
             The analyzer found fatal YAML or schema issues. Relationship and
             workload checks are incomplete until those blockers are fixed.
@@ -306,11 +386,13 @@ export function K8sResultsDashboard({
 
       {report.state === "ready" && report.findings.length === 0 ? (
         <Alert variant="success">
-          <AlertTitle>No production-readiness issues found by these checks</AlertTitle>
+          <AlertTitle>
+            No production-readiness issues found by these checks
+          </AlertTitle>
           <AlertDescription>
             This is not a guarantee of cluster safety. Keep validating rollout
-            behavior, access controls, secrets handling, and application-specific
-            probe endpoints before release.
+            behavior, access controls, secrets handling, and
+            application-specific probe endpoints before release.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -321,11 +403,18 @@ export function K8sResultsDashboard({
           <AlertDescription>
             {lowConfidenceCount} finding
             {lowConfidenceCount === 1 ? " is" : "s are"} marked low confidence.
-            Keep extra review on selectors, probes, and migration guidance before
-            changing manifests.
+            Keep extra review on selectors, probes, and migration guidance
+            before changing manifests.
           </AlertDescription>
         </Alert>
       ) : null}
+
+      <SensitiveDataWarning privacy={report.privacy} />
+
+      <p className="text-muted text-sm leading-6">
+        Static review only; verify against your cluster policies before
+        deployment.
+      </p>
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <K8sScoreSummary report={report} stale={stale} />
@@ -334,8 +423,8 @@ export function K8sResultsDashboard({
 
       <SeveritySummaryCards severityCounts={report.severityCounts} />
 
-      <Tabs defaultValue="findings">
-        <TabsList className="h-auto w-full flex-wrap justify-start">
+      <Tabs value={activeTab} onValueChange={onActiveTabChange}>
+        <TabsList className="h-auto w-full justify-start">
           <TabsTrigger value="findings">
             Findings ({report.findings.length})
           </TabsTrigger>
@@ -352,7 +441,9 @@ export function K8sResultsDashboard({
         </TabsList>
 
         <TabsContent value="findings" className="space-y-6">
-          {parseIssues.length > 0 ? <ParseIssuesPanel issues={parseIssues} /> : null}
+          {parseIssues.length > 0 ? (
+            <ParseIssuesPanel issues={parseIssues} />
+          ) : null}
 
           <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-4">
@@ -365,11 +456,23 @@ export function K8sResultsDashboard({
                 }}
                 matchCount={filteredFindings.length}
                 totalCount={report.findings.length}
+                searchInputId={findingsSearchInputId}
+                searchInputRef={findingsSearchInputRef}
                 onChange={setFilters}
                 onReset={() => setFilters(defaultFindingFilterState)}
               />
 
               <FindingsList
+                key={[
+                  report.findings.length,
+                  filteredFindings.length,
+                  filters.severity,
+                  filters.category,
+                  filters.namespace,
+                  filters.resourceKind,
+                  filters.search,
+                  filters.warningsOnly ? "warnings" : "all",
+                ].join(":")}
                 findings={filteredFindings}
                 totalCount={report.findings.length}
                 emptyTitle={
@@ -407,7 +510,9 @@ export function K8sResultsDashboard({
             <RelationshipIssuesPanel issues={report.relationshipGraph.issues} />
           ) : (
             <Alert variant="success">
-              <AlertTitle>No tracked relationship breakages detected</AlertTitle>
+              <AlertTitle>
+                No tracked relationship breakages detected
+              </AlertTitle>
               <AlertDescription>
                 Services, PDBs, HPAs, and the selector relationships this tool
                 understands resolved without a reported mismatch.
@@ -423,51 +528,9 @@ export function K8sResultsDashboard({
         </TabsContent>
 
         <TabsContent value="fixes" className="space-y-6">
-          <Alert variant="info">
-            <AlertTitle>Fix suggestions are copyable guidance only</AlertTitle>
-            <AlertDescription>
-              Nothing in your manifests is modified automatically yet. Use the
-              suggested YAML, patch-like snippets, and manual guidance as a
-              reviewed starting point.
-            </AlertDescription>
-          </Alert>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <FixSummaryStat
-              label="Findings with fixes"
-              value={String(allFixableFindings.length)}
-            />
-            <FixSummaryStat
-              label="Copyable snippets"
-              value={String(copyableFixes)}
-            />
-            <FixSummaryStat
-              label="Needs review"
-              value={String(fixesNeedingReview)}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-muted text-sm leading-6">
-              Copy all currently visible low-risk fix snippets in one bundle for
-              code review or handoff.
-            </p>
-            {safeFixBundle ? <CopyButton value={safeFixBundle} /> : null}
-          </div>
-
-          <FindingsList
+          <FixesTab
             findings={fixableFindings}
-            totalCount={allFixableFindings.length}
-            emptyTitle={
-              allFixableFindings.length === 0
-                ? "No fix suggestions available"
-                : "No fixes match the current filters"
-            }
-            emptyDescription={
-              allFixableFindings.length === 0
-                ? "The current report did not attach copyable or manual fix guidance to its findings."
-                : "Adjust the current filters to bring fixable findings back into view."
-            }
+            totalFixCount={allFixableFindings.length}
           />
         </TabsContent>
 
@@ -477,19 +540,22 @@ export function K8sResultsDashboard({
               <div className="space-y-1">
                 <CardTitle>Raw report JSON</CardTitle>
                 <CardDescription>
-                  Useful for debugging and power users. The object includes the
-                  original manifest input and parse details, so share it carefully.
+                  Useful for debugging and power users. Sensitive fields are
+                  redacted by default in this view.
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Badge
-                  variant={report.canShareReportSafely ? "info" : "warning"}
-                >
-                  {report.canShareReportSafely
-                    ? "Includes raw manifest text"
-                    : "Sensitive review findings present"}
+                <Badge variant={redactVisibleOutput ? "success" : "warning"}>
+                  {redactVisibleOutput
+                    ? "Visible output redacted"
+                    : "Full visible output"}
                 </Badge>
-                <CopyButton value={reportJson} />
+                <CopyButton
+                  value={reportJson}
+                  label="Copy JSON"
+                  ariaLabel="Copy raw report JSON"
+                  showInlineFeedback
+                />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -504,6 +570,9 @@ export function K8sResultsDashboard({
                 </Button>
                 <p className="text-muted text-sm leading-6">
                   Collapsed by default so the rest of the review stays usable.
+                  {redactVisibleOutput
+                    ? " Redaction is on for this report view."
+                    : " Redaction is off, so review before copying or sharing."}
                 </p>
               </div>
 
@@ -514,8 +583,8 @@ export function K8sResultsDashboard({
               ) : (
                 <div className="border-border bg-background-muted/30 rounded-2xl border p-4">
                   <p className="text-muted text-sm leading-6">
-                    Expand the raw JSON when you want the exact in-memory report
-                    object for debugging, tests, or deeper technical review.
+                    Expand the JSON when you want the current report object for
+                    debugging, tests, or deeper technical review.
                   </p>
                 </div>
               )}
@@ -552,7 +621,9 @@ function ParseIssuesPanel({ issues }: { issues: readonly K8sParseError[] }) {
             >
               <div className="flex flex-wrap items-center gap-2">
                 <Badge
-                  variant={issue.severity === "error" ? "destructive" : "warning"}
+                  variant={
+                    issue.severity === "error" ? "destructive" : "warning"
+                  }
                 >
                   {issue.severity}
                 </Badge>
@@ -560,7 +631,9 @@ function ParseIssuesPanel({ issues }: { issues: readonly K8sParseError[] }) {
                   {locationLabel}
                 </p>
               </div>
-              <p className="text-foreground text-sm leading-6">{issue.message}</p>
+              <p className="text-foreground text-sm leading-6">
+                {issue.message}
+              </p>
               {issue.detail ? (
                 <p className="text-muted text-sm leading-6">{issue.detail}</p>
               ) : null}
@@ -604,7 +677,9 @@ function RelationshipIssuesPanel({
             className="border-border bg-background-muted/30 grid gap-3 rounded-2xl border p-4"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={issue.severity === "error" ? "destructive" : "warning"}>
+              <Badge
+                variant={issue.severity === "error" ? "destructive" : "warning"}
+              >
                 {issue.severity}
               </Badge>
               <p className="text-foreground text-sm font-semibold">
@@ -614,7 +689,11 @@ function RelationshipIssuesPanel({
             <p className="text-muted text-sm leading-6">{issue.message}</p>
             {issue.targetRef ? (
               <p className="text-muted text-sm">
-                Target: {formatK8sResourceLabel({ ...issue.targetRef, documentIndex: -1 })}
+                Target:{" "}
+                {formatK8sResourceLabel({
+                  ...issue.targetRef,
+                  documentIndex: -1,
+                })}
               </p>
             ) : null}
           </div>
@@ -690,7 +769,10 @@ function RelationshipSectionCard({
               {item.issues.length > 0 ? (
                 <div className="grid gap-2">
                   {item.issues.map((issue) => (
-                    <p key={issue} className="text-foreground text-sm leading-6">
+                    <p
+                      key={issue}
+                      className="text-foreground text-sm leading-6"
+                    >
                       {issue}
                     </p>
                   ))}
@@ -699,21 +781,12 @@ function RelationshipSectionCard({
             </div>
           ))
         ) : (
-          <p className="text-muted text-sm leading-6">{section.emptyDescription}</p>
+          <p className="text-muted text-sm leading-6">
+            {section.emptyDescription}
+          </p>
         )}
       </CardContent>
     </Card>
-  );
-}
-
-function FixSummaryStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-background-muted/25 rounded-2xl border p-4">
-      <p className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
-        {label}
-      </p>
-      <p className="text-foreground mt-2 text-2xl font-semibold">{value}</p>
-    </div>
   );
 }
 
@@ -761,8 +834,12 @@ function buildFindingSearchText(finding: K8sFinding) {
     .toLowerCase();
 }
 
-function buildResourceSummaryRows(report: K8sAnalysisReport): ResourceSummaryRow[] {
-  const resourceLookup = createResourceLookup(report.relationshipGraph.resources);
+function buildResourceSummaryRows(
+  report: K8sAnalysisReport,
+): ResourceSummaryRow[] {
+  const resourceLookup = createResourceLookup(
+    report.relationshipGraph.resources,
+  );
   const relatedResources = new Map<string, Set<string>>();
   const findingCounts = new Map<string, number>();
   const issueCounts = new Map<string, number>();
@@ -834,8 +911,8 @@ function buildResourceSummaryRows(report: K8sAnalysisReport): ResourceSummaryRow
       namespaceLabel: formatK8sNamespaceLabel(resource.namespace),
       kind: resource.kind,
       name: resource.name,
-      relationships: [...(relatedResources.get(resource.id) ?? [])].sort((left, right) =>
-        left.localeCompare(right),
+      relationships: [...(relatedResources.get(resource.id) ?? [])].sort(
+        (left, right) => left.localeCompare(right),
       ),
       findingCount: findingCounts.get(resource.id) ?? 0,
       issueCount: issueCounts.get(resource.id) ?? 0,
@@ -851,7 +928,11 @@ function buildRelationshipSections(
       title: "Service to workload mappings",
       description:
         "Each Service should resolve to the workloads its selector intends to expose.",
-      items: buildRelationshipSectionItems(graph.services, graph, "service-targets"),
+      items: buildRelationshipSectionItems(
+        graph.services,
+        graph,
+        "service-targets",
+      ),
       emptyDescription:
         "No Service resources were available in this manifest set.",
     },

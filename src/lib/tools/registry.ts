@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Route } from "next";
+import { createPageMetadata } from "@/lib/site";
 
 export type ToolDefinition = {
   id: string;
@@ -20,23 +21,26 @@ export type ToolDefinition = {
 export const toolRegistry: ToolDefinition[] = [
   {
     id: "kubernetes-manifest-analyzer",
-    name: "Kubernetes Manifest Production-Readiness Analyzer",
-    shortName: "K8s Readiness Analyzer",
+    name: "Kubernetes Manifest Analyzer",
+    shortName: "K8s Analyzer",
     slug: "/tools/kubernetes-manifest-analyzer",
     category: "Kubernetes and DevOps",
     description:
-      "Review Kubernetes YAML manifests for production-readiness signals such as resources, health probes, non-root execution, and safer deployment defaults with a browser-first experience.",
+      "Review Kubernetes YAML manifests for production-readiness risks such as probes, resources, security context, selectors, exposure, and safer deployment defaults with a browser-first experience.",
     shortDescription:
-      "Analyze Kubernetes manifests for production-readiness signals with a browser-first workflow.",
+      "Analyze Kubernetes manifests locally for production-readiness, security, networking, and remediation guidance.",
     tags: [
       "Kubernetes",
       "YAML",
       "DevOps",
       "SRE",
+      "manifest analyzer",
+      "YAML checker",
       "production readiness",
       "security",
       "probes",
       "resources",
+      "service selector",
     ],
     audiences: [
       "Platform engineers",
@@ -44,9 +48,10 @@ export const toolRegistry: ToolDefinition[] = [
       "Application developers shipping to Kubernetes",
     ],
     status: "Foundational",
-    seoTitle: "Kubernetes Manifest Production-Readiness Analyzer | Authos",
+    seoTitle:
+      "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | Authos",
     seoDescription:
-      "Authos helps teams review Kubernetes manifests for production-readiness with browser-first checks for probes, resources, and safer runtime defaults.",
+      "Analyze Kubernetes YAML locally for probes, resource limits, security context, service selectors, exposure risks, and readiness gaps before production deploys.",
     relatedToolIds: [],
   },
 ];
@@ -82,9 +87,10 @@ export function getToolBySlug(slug: Route): ToolDefinition {
 export function getToolMetadata(id: string): Metadata {
   const tool = getToolById(id);
 
-  return {
-    title: { absolute: tool.seoTitle },
+  return createPageMetadata({
+    title: tool.seoTitle,
     description: tool.seoDescription,
+    path: tool.slug,
     keywords: [tool.category, ...tool.tags, ...tool.audiences],
-  };
+  });
 }

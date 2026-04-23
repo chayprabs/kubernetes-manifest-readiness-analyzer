@@ -31,6 +31,8 @@ export function FileDropzone({
   title = "Drop a manifest to analyze",
 }: FileDropzoneProps) {
   const inputId = useId();
+  const titleId = useId();
+  const descriptionId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -68,6 +70,10 @@ export function FileDropzone({
       <label
         htmlFor={inputId}
         tabIndex={disabled ? -1 : 0}
+        role="button"
+        aria-disabled={disabled}
+        aria-describedby={descriptionId}
+        aria-labelledby={titleId}
         className={cn(
           "border-border bg-background-muted/60 focus-visible:ring-accent focus-visible:ring-offset-background flex cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed px-6 py-10 text-center transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
           isDragging && "border-accent bg-accent-soft",
@@ -92,8 +98,15 @@ export function FileDropzone({
           <FileUp className="h-5 w-5" />
         </div>
         <div className="space-y-2">
-          <p className="text-foreground text-sm font-semibold">{title}</p>
-          <p className="text-muted max-w-md text-sm leading-6">{description}</p>
+          <p id={titleId} className="text-foreground text-sm font-semibold">
+            {title}
+          </p>
+          <p
+            id={descriptionId}
+            className="text-muted max-w-md text-sm leading-6"
+          >
+            {description}
+          </p>
         </div>
       </label>
     </div>

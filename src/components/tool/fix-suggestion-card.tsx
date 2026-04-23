@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { K8sFinding } from "@/lib/k8s/types";
 import {
@@ -29,12 +29,13 @@ export function FixSuggestionCard({
   compact = false,
   showFindingContext = false,
 }: FixSuggestionCardProps) {
-  if (!finding.fix) {
+  const fix = finding.fix;
+  const [snippetExpanded, setSnippetExpanded] = useState(!compact);
+  const snippetRegionId = useId();
+
+  if (!fix) {
     return null;
   }
-
-  const [snippetExpanded, setSnippetExpanded] = useState(!compact);
-  const fix = finding.fix;
   const snippet = buildDisplayFixSnippet(fix);
   const copyValue = buildFixCopyValue(finding) ?? snippet;
   const snippetHeading = getFixSnippetHeading(fix);
@@ -76,12 +77,16 @@ export function FixSuggestionCard({
                   ? "Review before applying"
                   : "Manual review required"}
             </Badge>
-            {fix.yamlPath ? <Badge variant="outline">Path {fix.yamlPath}</Badge> : null}
+            {fix.yamlPath ? (
+              <Badge variant="outline">Path {fix.yamlPath}</Badge>
+            ) : null}
           </div>
 
           <p className="text-muted text-sm leading-6">{fix.summary}</p>
           {fix.type === "manual-instruction" ? (
-            <p className="text-foreground text-sm leading-6">{fix.instructions}</p>
+            <p className="text-foreground text-sm leading-6">
+              {fix.instructions}
+            </p>
           ) : null}
         </div>
       </div>
@@ -111,8 +116,12 @@ export function FixSuggestionCard({
           variant="ghost"
           size="sm"
           onClick={() => setSnippetExpanded((value) => !value)}
+          aria-expanded={snippetExpanded}
+          aria-controls={snippetRegionId}
         >
-          {snippetExpanded ? "Hide snippet" : `Show ${snippetHeading.toLowerCase()}`}
+          {snippetExpanded
+            ? "Hide snippet"
+            : `Show ${snippetHeading.toLowerCase()}`}
           {snippetExpanded ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -122,14 +131,14 @@ export function FixSuggestionCard({
       </div>
 
       {snippetExpanded ? (
-        <div className="grid gap-3">
+        <div id={snippetRegionId} className="grid gap-3">
           <div className="space-y-1">
             <p className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
               {snippetHeading}
             </p>
             <p className="text-muted text-xs leading-5">
-              Template language is intentional. Review, customize, and then paste
-              it into the manifest where it belongs.
+              Template language is intentional. Review, customize, and then
+              paste it into the manifest where it belongs.
             </p>
           </div>
           <YamlSnippetBlock content={snippet} />

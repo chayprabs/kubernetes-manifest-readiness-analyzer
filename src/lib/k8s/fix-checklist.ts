@@ -115,7 +115,9 @@ export function buildFixCopyValue(finding: K8sFinding) {
     `Fix: ${finding.fix.title}`,
     `Fix type: ${formatK8sFixTypeLabel(finding.fix.type)}`,
     `Risk note: ${finding.fix.riskNote}`,
-    ...getFixCustomizationWarnings(finding).map((warning) => `Review note: ${warning}`),
+    ...getFixCustomizationWarnings(finding).map(
+      (warning) => `Review note: ${warning}`,
+    ),
     `${getFixSnippetHeading(finding.fix)}:\n${snippet}`,
   ].join("\n\n");
 }
@@ -287,7 +289,9 @@ function buildFixBucket(
   };
 }
 
-function buildResourceGroups(findings: readonly K8sFinding[]): K8sFixResourceGroup[] {
+function buildResourceGroups(
+  findings: readonly K8sFinding[],
+): K8sFixResourceGroup[] {
   const byResource = new Map<string, K8sFinding[]>();
 
   for (const finding of findings) {
@@ -304,19 +308,25 @@ function buildResourceGroups(findings: readonly K8sFinding[]): K8sFixResourceGro
       findings: sortFixFindings(resourceFindings),
       count: resourceFindings.length,
     }))
-    .sort((left, right) => compareResourceRefs(left.resourceRef, right.resourceRef));
+    .sort((left, right) =>
+      compareResourceRefs(left.resourceRef, right.resourceRef),
+    );
 }
 
 function sortFixFindings(findings: readonly K8sFinding[]) {
   return [...findings].sort((left, right) => {
     const severityDelta =
-      getFindingSeverityRank(right.severity) - getFindingSeverityRank(left.severity);
+      getFindingSeverityRank(right.severity) -
+      getFindingSeverityRank(left.severity);
 
     if (severityDelta !== 0) {
       return severityDelta;
     }
 
-    const resourceDelta = compareResourceRefs(left.resourceRef, right.resourceRef);
+    const resourceDelta = compareResourceRefs(
+      left.resourceRef,
+      right.resourceRef,
+    );
 
     if (resourceDelta !== 0) {
       return resourceDelta;
@@ -327,7 +337,9 @@ function sortFixFindings(findings: readonly K8sFinding[]) {
 }
 
 function compareResourceRefs(left: K8sObjectRef, right: K8sObjectRef) {
-  const namespaceDelta = (left.namespace ?? "").localeCompare(right.namespace ?? "");
+  const namespaceDelta = (left.namespace ?? "").localeCompare(
+    right.namespace ?? "",
+  );
 
   if (namespaceDelta !== 0) {
     return namespaceDelta;
@@ -359,14 +371,18 @@ function getResourceGroupKey(ref: K8sObjectRef) {
 
 function formatResourceRef(ref: K8sObjectRef) {
   if (ref.kind && ref.name) {
-    return ref.namespace ? `${ref.kind}/${ref.name} (${ref.namespace})` : `${ref.kind}/${ref.name}`;
+    return ref.namespace
+      ? `${ref.kind}/${ref.name} (${ref.namespace})`
+      : `${ref.kind}/${ref.name}`;
   }
 
   if (ref.kind) {
     return ref.namespace ? `${ref.kind} (${ref.namespace})` : ref.kind;
   }
 
-  return ref.documentIndex >= 0 ? `Document ${ref.documentIndex + 1}` : "Manifest input";
+  return ref.documentIndex >= 0
+    ? `Document ${ref.documentIndex + 1}`
+    : "Manifest input";
 }
 
 function toCommentBlock(lines: readonly string[]) {

@@ -38,7 +38,14 @@ export function ResourceSummaryTable({
             objects, and where findings are concentrated.
           </CardDescription>
         </div>
-        {copyValue ? <CopyButton value={copyValue} /> : null}
+        {copyValue ? (
+          <CopyButton
+            value={copyValue}
+            label="Copy summary"
+            ariaLabel="Copy resource summary"
+            showInlineFeedback
+          />
+        ) : null}
       </CardHeader>
       <CardContent className="space-y-4">
         {!rows.length ? (
@@ -75,7 +82,8 @@ export function ResourceSummaryTable({
                       : "No matched Service, PDB, HPA, or NetworkPolicy relationships were found."}
                   </p>
                   <p className="text-foreground text-sm font-medium">
-                    {row.findingCount} finding{row.findingCount === 1 ? "" : "s"}
+                    {row.findingCount} finding
+                    {row.findingCount === 1 ? "" : "s"}
                   </p>
                 </div>
               ))}
@@ -98,7 +106,9 @@ export function ResourceSummaryTable({
                       className="border-border bg-background-muted/25 grid grid-cols-[1.1fr_0.9fr_1.2fr_2.2fr_0.8fr] gap-4 rounded-2xl border px-4 py-4"
                     >
                       <div className="space-y-2">
-                        <p className="text-foreground text-sm">{row.namespaceLabel}</p>
+                        <p className="text-foreground text-sm">
+                          {row.namespaceLabel}
+                        </p>
                         {row.issueCount > 0 ? (
                           <Badge variant="warning">
                             {row.issueCount} broken

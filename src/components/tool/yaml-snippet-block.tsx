@@ -10,7 +10,8 @@ export function YamlSnippetBlock({
   className,
 }: YamlSnippetBlockProps) {
   const normalizedContent = content.trimEnd();
-  const lines = normalizedContent.length > 0 ? normalizedContent.split("\n") : [];
+  const lines =
+    normalizedContent.length > 0 ? normalizedContent.split("\n") : [];
 
   return (
     <pre
@@ -55,13 +56,15 @@ function renderYamlLine(line: string) {
     return (
       <>
         {indentation}
-        {listPrefix ? <span className="text-slate-400">{listPrefix}</span> : null}
+        {listPrefix ? (
+          <span className="text-slate-400">{listPrefix}</span>
+        ) : null}
         <span className={getValueClassName(remainder)}>{remainder}</span>
       </>
     );
   }
 
-  const [, key, spacing, value] = keyMatch;
+  const [, key, spacing, value = ""] = keyMatch;
   const [mainValue, inlineComment] = splitInlineComment(value);
 
   return (
@@ -87,10 +90,7 @@ function splitInlineComment(value: string) {
     return [value, ""] as const;
   }
 
-  return [
-    value.slice(0, commentIndex),
-    value.slice(commentIndex + 1),
-  ] as const;
+  return [value.slice(0, commentIndex), value.slice(commentIndex + 1)] as const;
 }
 
 function getValueClassName(value: string) {
@@ -119,7 +119,10 @@ function getValueClassName(value: string) {
     return "text-fuchsia-300";
   }
 
-  if (/^-?\d+(\.\d+)?%?$/.test(normalized) || /^-?\d+(m|Mi|Gi|Ki)$/.test(normalized)) {
+  if (
+    /^-?\d+(\.\d+)?%?$/.test(normalized) ||
+    /^-?\d+(m|Mi|Gi|Ki)$/.test(normalized)
+  ) {
     return "text-cyan-300";
   }
 

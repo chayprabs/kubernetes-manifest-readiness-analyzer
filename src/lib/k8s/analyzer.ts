@@ -1,33 +1,89 @@
 import { parseK8sYaml } from "@/lib/k8s/parser";
+import { analyzeK8sPrivacy } from "@/lib/k8s/privacy";
 import { buildK8sRelationshipGraph } from "@/lib/k8s/relationships";
 import { k8sRules } from "@/lib/k8s/rules";
 import { runK8sRuleEngine } from "@/lib/k8s/rule-engine";
 import type {
   K8sAnalysisReport,
+  K8sAnalysisProgressUpdate,
   K8sAnalyzerOptions,
   K8sFinding,
+  K8sParseResult,
 } from "@/lib/k8s/types";
+
+type AnalyzeK8sManifestsExecutionOptions = {
+  onProgress?: ((update: K8sAnalysisProgressUpdate) => void) | undefined;
+};
 
 export function analyzeK8sManifests(
   raw: string,
   options: K8sAnalyzerOptions = {},
+  executionOptions: AnalyzeK8sManifestsExecutionOptions = {},
 ): K8sAnalysisReport {
+  const startedAt = now();
+  let parseMs = 0;
+  let analyzeMs = 0;
+  let parseResult: K8sParseResult | null = null;
+  let analyzeStartedAt: number | null = null;
+
   try {
-    const parseResult = parseK8sYaml(raw);
+    executionOptions.onProgress?.({
+      stage: "parse",
+      progress: 18,
+      message: "Analyzing locally...",
+    });
+
+    const parseStartedAt = now();
+    parseResult = parseK8sYaml(raw);
+    parseMs = now() - parseStartedAt;
+
+    executionOptions.onProgress?.({
+      stage: "relationships",
+      progress: 46,
+      message: "Parsed manifests locally. Building relationships...",
+    });
+
+    analyzeStartedAt = now();
     const relationshipGraph = buildK8sRelationshipGraph(parseResult.documents);
 
-    return runK8sRuleEngine({
+    executionOptions.onProgress?.({
+      stage: "rules",
+      progress: 76,
+      message: "Running readiness checks locally...",
+    });
+
+    const report = runK8sRuleEngine({
       raw,
       parseResult,
       relationshipGraph,
       rules: options.rules ?? k8sRules,
       options,
     });
+    const privacy = analyzeK8sPrivacy(raw, parseResult);
+
+    analyzeMs = now() - analyzeStartedAt;
+
+    executionOptions.onProgress?.({
+      stage: "finalize",
+      progress: 92,
+      message: "Finalizing the local analysis report...",
+    });
+
+    return attachAnalysisMetadata(
+      attachPrivacySummary(report, privacy),
+      parseResult,
+      parseMs,
+      analyzeMs,
+      startedAt,
+    );
   } catch (error) {
+    if (analyzeStartedAt !== null && analyzeMs === 0) {
+      analyzeMs = now() - analyzeStartedAt;
+    }
+
     const fallbackParseResult = parseK8sYaml("");
     const fallbackRelationshipGraph = buildK8sRelationshipGraph([]);
-
-    return runK8sRuleEngine({
+    const report = runK8sRuleEngine({
       raw,
       parseResult: {
         ...fallbackParseResult,
@@ -49,6 +105,17 @@ export function analyzeK8sManifests(
       rules: [],
       options,
     });
+
+    return attachAnalysisMetadata(
+      attachPrivacySummary(
+        report,
+        analyzeK8sPrivacy(raw, parseResult ?? fallbackParseResult),
+      ),
+      parseResult ?? fallbackParseResult,
+      parseMs,
+      analyzeMs,
+      startedAt,
+    );
   }
 }
 
@@ -57,6 +124,45 @@ export function analyzeManifestText(
   options: K8sAnalyzerOptions = {},
 ): K8sFinding[] {
   return analyzeK8sManifests(manifest, options).findings;
+}
+
+function attachAnalysisMetadata(
+  report: K8sAnalysisReport,
+  parseResult: K8sParseResult,
+  parseMs: number,
+  analyzeMs: number,
+  startedAt: number,
+): K8sAnalysisReport {
+  return {
+    ...report,
+    analysisMetadata: {
+      parseMs: roundDuration(parseMs),
+      analyzeMs: roundDuration(analyzeMs),
+      totalMs: roundDuration(now() - startedAt),
+      documentCount: parseResult.input.documentCount,
+      inputBytes: parseResult.input.sizeBytes,
+    },
+  };
+}
+
+function attachPrivacySummary(
+  report: K8sAnalysisReport,
+  privacy: ReturnType<typeof analyzeK8sPrivacy>,
+): K8sAnalysisReport {
+  return {
+    ...report,
+    canShareReportSafely:
+      report.canShareReportSafely && !privacy.sensitiveDataDetected,
+    privacy,
+  };
+}
+
+function roundDuration(value: number) {
+  return Math.max(0, Math.round(value * 100) / 100);
+}
+
+function now() {
+  return performance.now();
 }
 
 export const sampleProductionReadyManifest = `apiVersion: apps/v1

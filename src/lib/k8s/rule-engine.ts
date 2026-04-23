@@ -129,6 +129,22 @@ export function runK8sRuleEngine({
     fixFirstFindings: scorecard.fixFirstFindings,
     positiveChecks: scorecard.positiveChecks,
     scoreBreakdown: scorecard.scoreBreakdown,
+    analysisMetadata: {
+      parseMs: 0,
+      analyzeMs: 0,
+      totalMs: 0,
+      documentCount: parseResult.input.documentCount,
+      inputBytes: parseResult.input.sizeBytes,
+    },
+    privacy: {
+      sensitiveDataDetected: false,
+      signalCount: 0,
+      detectedKinds: [],
+      warningTitle: "No obvious sensitive manifest values detected",
+      warningText:
+        "Visible exports still exclude raw YAML by default until privacy analysis attaches a more specific summary.",
+      signals: [],
+    },
   };
 }
 

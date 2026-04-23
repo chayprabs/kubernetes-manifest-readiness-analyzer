@@ -49,9 +49,17 @@ export function FixFirstPanel({
                       </p>
                     </div>
                   </div>
-                  {fixCopyValue ? <CopyButton value={fixCopyValue} /> : null}
+                  {fixCopyValue ? (
+                    <CopyButton
+                      value={fixCopyValue}
+                      ariaLabel="Copy fix-first recommendation"
+                      showInlineFeedback
+                    />
+                  ) : null}
                 </div>
-                <p className="text-muted text-sm leading-6">{finding.message}</p>
+                <p className="text-muted text-sm leading-6">
+                  {finding.message}
+                </p>
                 <p className="text-foreground text-sm leading-6">
                   {finding.fix?.summary ?? finding.recommendation}
                 </p>

@@ -5,11 +5,20 @@ import type {
   K8sParseError,
   K8sRelationshipGraph,
 } from "@/lib/k8s/types";
+import {
+  buildExportableManifestText,
+  redactK8sValueForDisplay,
+} from "@/lib/k8s/privacy";
 import { buildK8sHtmlReport } from "@/lib/k8s/report-html";
-import { buildK8sMarkdownReport, type K8sMarkdownReportOptions } from "@/lib/k8s/report-markdown";
+import {
+  buildK8sMarkdownReport,
+  type K8sMarkdownReportOptions,
+} from "@/lib/k8s/report-markdown";
+import { buildSafeCopyFixBundle } from "@/lib/k8s/fix-checklist";
 
 export type K8sReportExportOptions = K8sMarkdownReportOptions & {
   includeRawInput?: boolean;
+  redactSensitiveOutput?: boolean;
 };
 
 export function buildK8sJsonExport(
@@ -25,13 +34,20 @@ export function buildK8sJsonExportObject(
 ) {
   const generatedAt = toExportTimestamp(options.generatedAt);
   const includeRawInput = options.includeRawInput === true;
+  const redactSensitiveOutput = options.redactSensitiveOutput !== false;
+  const rawInput = includeRawInput
+    ? buildExportableManifestText(report, {
+        redactSensitiveOutput,
+      })
+    : undefined;
 
-  return {
+  const exportObject = {
     exportMetadata: {
       generatedAt,
       generatedLocallyInBrowser: true,
       reviewType: "static-manifest-review",
       includesRawInput: includeRawInput,
+      redactedByDefault: redactSensitiveOutput,
       privacyWarning: getPrivacyWarning(report) ?? undefined,
     },
     report: {
@@ -58,16 +74,26 @@ export function buildK8sJsonExportObject(
       resourceSummary: report.resourceSummary,
       positiveChecks: report.positiveChecks,
       scoreBreakdown: report.scoreBreakdown,
-      parseResult: sanitizeParseResult(report, includeRawInput),
+      analysisMetadata: report.analysisMetadata,
+      privacy: report.privacy,
+      parseResult: sanitizeParseResult(report, rawInput),
       findings: report.findings.map(sanitizeFinding),
       fixFirstFindings: report.fixFirstFindings.map(sanitizeFinding),
       relationshipGraph: sanitizeRelationshipGraph(report.relationshipGraph),
-      ...(includeRawInput ? { rawInput: report.raw } : {}),
+      ...(rawInput ? { rawInput } : {}),
     },
   };
+
+  return redactSensitiveOutput
+    ? (redactK8sValueForDisplay(exportObject) as typeof exportObject)
+    : exportObject;
 }
 
-export function buildK8sCsvFindingsExport(report: K8sAnalysisReport) {
+export function buildK8sCsvFindingsExport(
+  report: K8sAnalysisReport,
+  options: K8sReportExportOptions = {},
+) {
+  const redactSensitiveOutput = options.redactSensitiveOutput !== false;
   const rows = [
     ["severity", "category", "resource", "title", "recommendation"],
     ...report.findings.map((finding) => [
@@ -79,40 +105,25 @@ export function buildK8sCsvFindingsExport(report: K8sAnalysisReport) {
     ]),
   ];
 
-  return rows
-    .map((row) => row.map(escapeCsvCell).join(","))
-    .join("\n");
+  const csv = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
+
+  return redactSensitiveOutput ? String(redactK8sValueForDisplay(csv)) : csv;
 }
 
 export function buildSafeFixBundle(findings: readonly K8sFinding[]) {
-  const safeFixes = findings.filter(
-    (finding) =>
-      Boolean(finding.fix?.copyableContent) && finding.fix?.safeToAutoApply === true,
-  );
-
-  if (safeFixes.length === 0) {
-    return "";
-  }
-
-  return safeFixes
-    .map((finding, index) => [
-      `# ${index + 1}. ${finding.title}`,
-      `Resource: ${formatFindingResource(finding)}`,
-      `Fix: ${finding.fix!.title}`,
-      "",
-      finding.fix!.copyableContent!,
-    ].join("\n"))
-    .join("\n\n---\n\n");
+  return buildSafeCopyFixBundle(findings);
 }
 
-export function buildResourceSummaryCopy(rows: ReadonlyArray<{
-  namespaceLabel: string;
-  kind: string;
-  name: string;
-  relationships: readonly string[];
-  findingCount: number;
-  issueCount: number;
-}>) {
+export function buildResourceSummaryCopy(
+  rows: ReadonlyArray<{
+    namespaceLabel: string;
+    kind: string;
+    name: string;
+    relationships: readonly string[];
+    findingCount: number;
+    issueCount: number;
+  }>,
+) {
   if (rows.length === 0) {
     return "No resources were available in this report.";
   }
@@ -120,18 +131,20 @@ export function buildResourceSummaryCopy(rows: ReadonlyArray<{
   return [
     "| Namespace | Kind | Name | Relationships | Findings | Broken relationships |",
     "| --- | --- | --- | --- | ---: | ---: |",
-    ...rows.map((row) =>
-      [
-        row.namespaceLabel,
-        row.kind,
-        row.name,
-        row.relationships.length > 0 ? row.relationships.join("; ") : "None",
-        String(row.findingCount),
-        String(row.issueCount),
-      ]
-        .map((value) => value.replaceAll("|", "\\|"))
-        .join(" | "),
-    ).map((row) => `| ${row} |`),
+    ...rows
+      .map((row) =>
+        [
+          row.namespaceLabel,
+          row.kind,
+          row.name,
+          row.relationships.length > 0 ? row.relationships.join("; ") : "None",
+          String(row.findingCount),
+          String(row.issueCount),
+        ]
+          .map((value) => value.replaceAll("|", "\\|"))
+          .join(" | "),
+      )
+      .map((row) => `| ${row} |`),
   ].join("\n");
 }
 
@@ -158,12 +171,9 @@ export function buildK8sExportBaseName(
     .replaceAll(":", "-")
     .replaceAll(" ", "_");
 
-  return [
-    "k8s-review",
-    report.profile.id,
-    report.readinessScore,
-    stamp,
-  ].join("-");
+  return ["k8s-review", report.profile.id, report.readinessScore, stamp].join(
+    "-",
+  );
 }
 
 export function downloadTextFile(
@@ -189,7 +199,7 @@ export function downloadTextFile(
 
 function sanitizeParseResult(
   report: K8sAnalysisReport,
-  includeRawInput: boolean,
+  rawInput: string | undefined,
 ) {
   return {
     ok: report.parseResult.ok,
@@ -213,8 +223,8 @@ function sanitizeParseResult(
       sizeBytes: report.parseResult.input.sizeBytes,
       recommendedMaxBytes: report.parseResult.input.recommendedMaxBytes,
       emptyDocumentCount: report.parseResult.input.emptyDocumentCount,
-      documentCount: report.parseResult.input.documents.length,
-      ...(includeRawInput ? { raw: report.parseResult.input.raw } : {}),
+      documentCount: report.parseResult.input.documentCount,
+      ...(rawInput ? { raw: rawInput } : {}),
     },
   };
 }
@@ -265,15 +275,12 @@ function sanitizeFix(fix: K8sFixSuggestion | undefined) {
     ...(fix.type === "manual-instruction"
       ? { instructions: fix.instructions }
       : {}),
-    ...(fix.type === "strategic-merge-patch-like" || fix.type === "json-patch-like"
+    ...(fix.type === "strategic-merge-patch-like" ||
+    fix.type === "json-patch-like"
       ? { targetRef: fix.targetRef }
       : {}),
-    ...(fix.type === "json-patch-like"
-      ? { operations: fix.operations }
-      : {}),
-    ...(fix.type === "new-resource"
-      ? { resourceKind: fix.resourceKind }
-      : {}),
+    ...(fix.type === "json-patch-like" ? { operations: fix.operations } : {}),
+    ...(fix.type === "new-resource" ? { resourceKind: fix.resourceKind } : {}),
   };
 }
 
@@ -297,9 +304,9 @@ function sanitizeRelationshipGraph(graph: K8sRelationshipGraph) {
 }
 
 function getPrivacyWarning(report: K8sAnalysisReport) {
-  return report.canShareReportSafely
-    ? null
-    : "Secret-like data was detected in the input. Raw manifest content and secret values are intentionally omitted from this export.";
+  return report.privacy.sensitiveDataDetected
+    ? report.privacy.warningText
+    : null;
 }
 
 function formatFindingResource(finding: K8sFinding) {
@@ -313,7 +320,9 @@ function formatFindingResource(finding: K8sFinding) {
     return namespace ? `${kind} (${namespace})` : kind;
   }
 
-  return documentIndex >= 0 ? `Document ${documentIndex + 1}` : "Manifest input";
+  return documentIndex >= 0
+    ? `Document ${documentIndex + 1}`
+    : "Manifest input";
 }
 
 function escapeCsvCell(value: string) {

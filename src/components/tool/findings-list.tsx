@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { EmptyState } from "@/components/tool/empty-state";
 import { FindingCard } from "@/components/tool/finding-card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,9 @@ type FindingsListProps = {
   initialVisibleCount?: number;
 };
 
+const LARGE_FINDINGS_THRESHOLD = 200;
+const LARGE_FINDINGS_PAGE_SIZE = 40;
+
 export function FindingsList({
   findings,
   totalCount = findings.length,
@@ -25,37 +28,76 @@ export function FindingsList({
   initialVisibleCount = 12,
 }: FindingsListProps) {
   const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
-
-  useEffect(() => {
-    setVisibleCount(initialVisibleCount);
-  }, [findings, initialVisibleCount]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const pagedMode = findings.length > LARGE_FINDINGS_THRESHOLD;
+  const pageSize = pagedMode ? LARGE_FINDINGS_PAGE_SIZE : initialVisibleCount;
 
   if (!findings.length) {
-    return (
-      <EmptyState title={emptyTitle} description={emptyDescription} />
-    );
+    return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
 
-  const visibleFindings = findings.slice(0, visibleCount);
+  const pageStart = pagedMode ? pageIndex * pageSize : 0;
+  const pageEnd = pagedMode
+    ? Math.min(pageStart + pageSize, findings.length)
+    : visibleCount;
+  const visibleFindings = findings.slice(pageStart, pageEnd);
   const hasHiddenFindings = findings.length > visibleCount;
+  const totalPages = pagedMode ? Math.ceil(findings.length / pageSize) : 1;
 
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted text-sm leading-6">
-          {totalCount === findings.length
-            ? `Showing ${formatFindingCount(findings.length)}.`
-            : `Showing ${formatFindingCount(findings.length)} from ${formatFindingCount(totalCount)}.`}
+          {pagedMode
+            ? totalCount === findings.length
+              ? `Showing ${formatFindingCount(visibleFindings.length)} from ${formatFindingCount(findings.length)} on page ${pageIndex + 1} of ${totalPages}.`
+              : `Showing ${formatFindingCount(visibleFindings.length)} from ${formatFindingCount(findings.length)} filtered findings on page ${pageIndex + 1} of ${totalPages} (${formatFindingCount(totalCount)} total).`
+            : totalCount === findings.length
+              ? `Showing ${formatFindingCount(findings.length)}.`
+              : `Showing ${formatFindingCount(findings.length)} from ${formatFindingCount(totalCount)}.`}
         </p>
-        {findings.length > initialVisibleCount ? (
+        {pagedMode ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-muted text-xs leading-5">
+              Large result sets are paged to keep the browser responsive.
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setPageIndex((value) => Math.max(0, value - 1))}
+              disabled={pageIndex === 0}
+              aria-label="Go to the previous findings page"
+            >
+              Previous
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                setPageIndex((value) => Math.min(totalPages - 1, value + 1))
+              }
+              disabled={pageIndex >= totalPages - 1}
+              aria-label="Go to the next findings page"
+            >
+              Next
+            </Button>
+          </div>
+        ) : findings.length > initialVisibleCount ? (
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() =>
               setVisibleCount(
-                hasHiddenFindings ? visibleCount + initialVisibleCount : initialVisibleCount,
+                hasHiddenFindings
+                  ? visibleCount + initialVisibleCount
+                  : initialVisibleCount,
               )
+            }
+            aria-label={
+              hasHiddenFindings ? "Show more findings" : "Show fewer findings"
             }
           >
             {hasHiddenFindings

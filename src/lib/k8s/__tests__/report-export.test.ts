@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  analyzeK8sManifests,
-  sampleBrokenManifest,
-} from "@/lib/k8s/analyzer";
+import { analyzeK8sManifests, sampleBrokenManifest } from "@/lib/k8s/analyzer";
 import { createFinding } from "@/lib/k8s/findings";
 import {
   buildK8sCsvFindingsExport,
@@ -25,9 +22,11 @@ describe("Kubernetes report exports", () => {
     });
 
     expect(
-      buildK8sMarkdownExport(report, {
-        generatedAt: fixedTimestamp,
-      }),
+      normalizeTiming(
+        buildK8sMarkdownExport(report, {
+          generatedAt: fixedTimestamp,
+        }),
+      ),
     ).toMatchInlineSnapshot(`
       "# Kubernetes Manifest Review
 
@@ -42,6 +41,7 @@ describe("Kubernetes report exports", () => {
       - Kubernetes target: 1.30
       - Profile: Balanced
       - Objects analyzed: 1
+      - Analysis time: <timing>
       - Findings: 19
       - Generated timestamp: 2026-04-23 02:30:00 UTC
 
@@ -234,7 +234,25 @@ describe("Kubernetes report exports", () => {
     expect(serialized).not.toContain(literalSensitiveEnvDeployment);
     expect(serialized).not.toContain("super-secret-password-123");
     expect(exported.exportMetadata.includesRawInput).toBe(false);
+    expect(exported.exportMetadata.redactedByDefault).toBe(true);
     expect("rawInput" in exported.report).toBe(false);
+    expect(exported.report.analysisMetadata.documentCount).toBe(
+      report.analysisMetadata.documentCount,
+    );
+  });
+
+  it("keeps included manifest content redacted by default", () => {
+    const exported = buildK8sJsonExport(
+      analyzeK8sManifests(literalSecretManifest),
+      {
+        generatedAt: fixedTimestamp,
+        includeRawInput: true,
+      },
+    );
+
+    expect(exported).toContain("[REDACTED SECRET]");
+    expect(exported).not.toContain("dont-print-me");
+    expect(exported).not.toContain("also-do-not-print");
   });
 
   it("escapes commas and newlines in CSV exports", () => {
@@ -263,10 +281,16 @@ describe("Kubernetes report exports", () => {
       ],
     };
 
-    expect(buildK8sCsvFindingsExport(csvReport)).toBe([
-      `"severity","category","resource","title","recommendation"`,
-      `"medium","operations","Deployment/authos-demo (default)","Comma, newline title","Line one,`,
-      `line two"`,
-    ].join("\n"));
+    expect(buildK8sCsvFindingsExport(csvReport)).toBe(
+      [
+        `"severity","category","resource","title","recommendation"`,
+        `"medium","operations","Deployment/authos-demo (default)","Comma, newline title","Line one,`,
+        `line two"`,
+      ].join("\n"),
+    );
   });
 });
+
+function normalizeTiming(value: string) {
+  return value.replace(/- Analysis time: .+/u, "- Analysis time: <timing>");
+}

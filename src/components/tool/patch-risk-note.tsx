@@ -1,10 +1,6 @@
 import type { K8sFinding } from "@/lib/k8s/types";
 import { getFixCustomizationWarnings } from "@/lib/k8s/fix-checklist";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type PatchRiskNoteProps = {
   finding: K8sFinding;

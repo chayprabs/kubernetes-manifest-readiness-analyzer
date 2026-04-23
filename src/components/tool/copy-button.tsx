@@ -17,6 +17,7 @@ type CopyButtonProps = {
   label?: string;
   copiedLabel?: string;
   errorLabel?: string;
+  ariaLabel?: string;
   showText?: boolean;
   showInlineFeedback?: boolean;
   size?: ButtonProps["size"];
@@ -31,6 +32,7 @@ export function CopyButton({
   label = "Copy",
   copiedLabel = "Copied",
   errorLabel = "Copy failed",
+  ariaLabel,
   showText = false,
   showInlineFeedback = false,
   size,
@@ -90,10 +92,10 @@ export function CopyButton({
               onClick={handleCopy}
               aria-label={
                 copied
-                  ? "Copied"
+                  ? copiedLabel
                   : copyFailed
-                    ? "Copy failed"
-                    : "Copy to clipboard"
+                    ? errorLabel
+                    : (ariaLabel ?? `${label} to clipboard`)
               }
             >
               {copied ? (
@@ -107,6 +109,10 @@ export function CopyButton({
           <TooltipContent>{visibleLabel}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
+      <span className="sr-only" aria-live="polite">
+        {statusMessage ?? ""}
+      </span>
 
       {showInlineFeedback && statusMessage ? (
         <span

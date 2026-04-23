@@ -62,6 +62,9 @@ export function AlertDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-muted text-sm leading-6", className)} {...props} />
+    <p
+      className={cn("text-card-foreground/85 text-sm leading-6", className)}
+      {...props}
+    />
   );
 }

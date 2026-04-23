@@ -1,9 +1,16 @@
 import { findingSeverities } from "@/lib/k8s/findings";
-import type { K8sAnalysisReport, K8sFinding, K8sFindingSeverity } from "@/lib/k8s/types";
+import type {
+  K8sAnalysisReport,
+  K8sFinding,
+  K8sFindingSeverity,
+} from "@/lib/k8s/types";
+import { formatDurationMs } from "@/lib/k8s/analyzer-runtime";
+import { redactSensitiveText } from "@/lib/privacy/redaction";
 
 export type K8sMarkdownReportOptions = {
   generatedAt?: string | Date;
   maxFindings?: number;
+  redactSensitiveOutput?: boolean;
 };
 
 export function buildK8sMarkdownReport(
@@ -13,7 +20,10 @@ export function buildK8sMarkdownReport(
   const generatedAt = formatExportTimestamp(options.generatedAt);
   const maxFindings = options.maxFindings ?? 20;
   const visibleFindings = report.findings.slice(0, maxFindings);
-  const hiddenFindings = Math.max(report.findings.length - visibleFindings.length, 0);
+  const hiddenFindings = Math.max(
+    report.findings.length - visibleFindings.length,
+    0,
+  );
 
   const lines = [
     "# Kubernetes Manifest Review",
@@ -29,6 +39,7 @@ export function buildK8sMarkdownReport(
     `- Kubernetes target: ${report.options.kubernetesTargetVersion ?? "Not set"}`,
     `- Profile: ${report.profile.label}`,
     `- Objects analyzed: ${report.resourceSummary.totalObjects}`,
+    `- Analysis time: ${formatDurationMs(report.analysisMetadata.totalMs)}`,
     `- Findings: ${report.findings.length}`,
     `- Generated timestamp: ${generatedAt}`,
     "",
@@ -43,9 +54,12 @@ export function buildK8sMarkdownReport(
     "## Fix First",
     "",
     ...(report.fixFirstFindings.length > 0
-      ? report.fixFirstFindings.slice(0, 3).map((finding, index) =>
-          `${index + 1}. **${finding.title}** on \`${formatResourceLabel(finding)}\``,
-        )
+      ? report.fixFirstFindings
+          .slice(0, 3)
+          .map(
+            (finding, index) =>
+              `${index + 1}. **${finding.title}** on \`${formatResourceLabel(finding)}\``,
+          )
       : ["- No must-fix issues were selected for this report."]),
     "",
     "## Top Findings",
@@ -78,7 +92,11 @@ export function buildK8sMarkdownReport(
     );
   }
 
-  return lines.join("\n");
+  const markdown = lines.join("\n");
+
+  return options.redactSensitiveOutput === false
+    ? markdown
+    : redactSensitiveText(markdown);
 }
 
 function buildFindingSection(finding: K8sFinding, index: number) {
@@ -88,9 +106,7 @@ function buildFindingSection(finding: K8sFinding, index: number) {
     `   - Category: ${finding.category}`,
     `   - Finding: ${finding.message}`,
     `   - Recommendation: ${finding.recommendation}`,
-    ...(finding.fix
-      ? [`   - Suggested fix: ${finding.fix.title}`]
-      : []),
+    ...(finding.fix ? [`   - Suggested fix: ${finding.fix.title}`] : []),
     "",
   ];
 }
@@ -121,7 +137,9 @@ function formatResourceLabel(finding: K8sFinding) {
     return namespace ? `${kind} (${namespace})` : kind;
   }
 
-  return documentIndex >= 0 ? `Document ${documentIndex + 1}` : "Manifest input";
+  return documentIndex >= 0
+    ? `Document ${documentIndex + 1}`
+    : "Manifest input";
 }
 
 function formatExportTimestamp(value: string | Date | undefined) {

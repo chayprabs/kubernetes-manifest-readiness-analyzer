@@ -1,9 +1,7 @@
 "use client";
 
-import type {
-  K8sFindingCategory,
-  K8sFindingSeverity,
-} from "@/lib/k8s/types";
+import type { Ref } from "react";
+import type { K8sFindingCategory, K8sFindingSeverity } from "@/lib/k8s/types";
 import { formatFindingCount } from "@/lib/utils";
 import { formatK8sCategoryLabel } from "@/components/tool/k8s-dashboard-helpers";
 import { Button } from "@/components/ui/button";
@@ -46,6 +44,8 @@ type FindingFiltersProps = {
   options: FindingFilterOptions;
   matchCount: number;
   totalCount: number;
+  searchInputId?: string;
+  searchInputRef?: Ref<HTMLInputElement>;
   onChange: (nextFilters: FindingFilterState) => void;
   onReset: () => void;
 };
@@ -67,9 +67,13 @@ export function FindingFilters({
   options,
   matchCount,
   totalCount,
+  searchInputId,
+  searchInputRef,
   onChange,
   onReset,
 }: FindingFiltersProps) {
+  const searchFieldId = searchInputId ?? "finding-search-input";
+
   return (
     <div className="border-border bg-background-muted/35 grid gap-4 rounded-3xl border p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -98,7 +102,9 @@ export function FindingFilters({
               key={option.value}
               type="button"
               size="sm"
-              variant={filters.severity === option.value ? "default" : "outline"}
+              variant={
+                filters.severity === option.value ? "default" : "outline"
+              }
               onClick={() => onChange({ ...filters, severity: option.value })}
             >
               {option.label}
@@ -121,7 +127,7 @@ export function FindingFilters({
               })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Filter findings by category">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -148,7 +154,7 @@ export function FindingFilters({
               })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Filter findings by namespace">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -175,7 +181,7 @@ export function FindingFilters({
               })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="Filter findings by resource kind">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -212,10 +218,15 @@ export function FindingFilters({
       </div>
 
       <div className="grid gap-2">
-        <label className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
+        <label
+          htmlFor={searchFieldId}
+          className="text-muted text-xs font-semibold tracking-[0.18em] uppercase"
+        >
           Search
         </label>
         <Input
+          id={searchFieldId}
+          ref={searchInputRef}
           value={filters.search}
           onChange={(event) =>
             onChange({
@@ -223,7 +234,8 @@ export function FindingFilters({
               search: event.target.value,
             })
           }
-          placeholder="Search title, resource, message, recommendation, or fix text"
+          aria-label="Search findings"
+          placeholder="Search title, resource, message, recommendation, or fix text (Ctrl/Cmd + K)"
         />
       </div>
     </div>

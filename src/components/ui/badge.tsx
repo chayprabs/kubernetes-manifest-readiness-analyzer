@@ -12,12 +12,12 @@ type BadgeVariant =
 
 const variantClasses: Record<BadgeVariant, string> = {
   default: "bg-foreground text-background",
-  secondary: "bg-background-muted text-foreground",
+  secondary: "border border-border bg-background-muted text-foreground",
   outline: "border border-border bg-transparent text-foreground",
-  success: "bg-success/12 text-success",
-  warning: "bg-warning/12 text-warning",
-  destructive: "bg-destructive/12 text-destructive",
-  info: "bg-info/12 text-info",
+  success: "border border-success/30 bg-success/12 text-foreground",
+  warning: "border border-warning/30 bg-warning/12 text-foreground",
+  destructive: "border border-destructive/30 bg-destructive/12 text-foreground",
+  info: "border border-info/30 bg-info/12 text-foreground",
 };
 
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
@@ -32,7 +32,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-medium tracking-wide",
+        "inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium tracking-wide",
         variantClasses[variant],
         className,
       )}

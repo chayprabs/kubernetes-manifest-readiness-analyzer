@@ -45,9 +45,7 @@ export default function Home() {
             </Button>
             {primaryTool ? (
               <Button asChild variant="outline">
-                <Link href={primaryTool.slug}>
-                  Open {primaryTool.shortName}
-                </Link>
+                <Link href={primaryTool.slug}>Open {primaryTool.name}</Link>
               </Button>
             ) : null}
           </CardContent>

@@ -32,7 +32,9 @@ const fixturesDirectory = fileURLToPath(
 );
 
 export function loadK8sFixture(name: K8sFixtureName) {
-  return readFileSync(getK8sFixturePath(name), "utf8").trimEnd();
+  return readFileSync(getK8sFixturePath(name), "utf8")
+    .replace(/\r\n/g, "\n")
+    .trimEnd();
 }
 
 export function getK8sFixturePath(name: K8sFixtureName) {
@@ -65,7 +67,8 @@ export function buildGoldenReportSnapshot(report: K8sAnalysisReport) {
     resourceCounts: report.resourceCounts,
     resourceSummary: report.resourceSummary,
     analysisMetadata: {
-      ...report.analysisMetadata,
+      documentCount: report.analysisMetadata.documentCount,
+      inputBytes: "<bytes>",
       parseMs: "<timing>",
       analyzeMs: "<timing>",
       totalMs: "<timing>",

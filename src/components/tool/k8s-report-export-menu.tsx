@@ -8,6 +8,7 @@ import type { K8sAnalysisReport } from "@/lib/k8s/types";
 import {
   buildK8sCsvFindingsExport,
   buildK8sExportBaseName,
+  buildK8sHtmlExport,
   buildK8sJsonExport,
   buildK8sMarkdownExport,
   downloadTextFile,
@@ -70,6 +71,24 @@ export function K8sReportExportMenu({
         }),
       );
       setStatusMessage("Markdown report copied.");
+      trackAnalyticsEvent("report_copied", analyticsPayload);
+    } catch {
+      setStatusMessage("Clipboard access failed. Try a download instead.");
+    }
+  }
+
+  async function handleCopyHtml() {
+    if (!report) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        buildK8sHtmlExport(report, {
+          redactSensitiveOutput: redactVisibleOutput,
+        }),
+      );
+      setStatusMessage("HTML report copied.");
       trackAnalyticsEvent("report_copied", analyticsPayload);
     } catch {
       setStatusMessage("Clipboard access failed. Try a download instead.");
@@ -154,6 +173,24 @@ export function K8sReportExportMenu({
     trackAnalyticsEvent("report_downloaded", analyticsPayload);
   }
 
+  function handleDownloadHtml() {
+    if (!report) {
+      return;
+    }
+
+    const baseName = buildK8sExportBaseName(report);
+
+    downloadTextFile(
+      `${baseName}.html`,
+      buildK8sHtmlExport(report, {
+        redactSensitiveOutput: redactVisibleOutput,
+      }),
+      "text/html;charset=utf-8",
+    );
+    setStatusMessage("HTML report downloaded.");
+    trackAnalyticsEvent("report_downloaded", analyticsPayload);
+  }
+
   return (
     <>
       <div className="grid gap-2">
@@ -185,6 +222,12 @@ export function K8sReportExportMenu({
             >
               Copy Markdown
             </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!report}
+              onClick={() => void handleCopyHtml()}
+            >
+              Copy HTML
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               disabled={!report}
@@ -197,6 +240,9 @@ export function K8sReportExportMenu({
             </DropdownMenuItem>
             <DropdownMenuItem disabled={!report} onClick={handleDownloadCsv}>
               Download CSV
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled={!report} onClick={handleDownloadHtml}>
+              Download HTML
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

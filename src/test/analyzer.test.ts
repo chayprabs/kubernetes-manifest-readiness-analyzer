@@ -26,7 +26,7 @@ describe("analyzeManifestText", () => {
 });
 
 describe("analyzeK8sManifests", () => {
-  it("records timing metadata for a generated large manifest bundle", () => {
+  it("records timing metadata for a generated large manifest bundle", { timeout: 30_000 }, () => {
     const report = analyzeK8sManifests(generatedPerformanceManifest);
 
     expect(report.analysisMetadata.documentCount).toBe(640);

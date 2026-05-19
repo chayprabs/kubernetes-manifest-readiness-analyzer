@@ -44,9 +44,10 @@ coverage.
 - Readiness scoring, grade, risk level, positive checks, and prioritized
   fix-first findings
 - Fix suggestions in snippet, patch-like, manual, and new-resource formats
-- Privacy inspection and redacted exports for Markdown, JSON, and CSV
+- Privacy inspection and redacted exports for Markdown, JSON, CSV, and HTML
 - Browser worker execution with main-thread fallback
 - Sample manifests and fixture-backed test coverage
+- Registry-driven site navigation for live Authos tools
 
 ## Known Limitations
 

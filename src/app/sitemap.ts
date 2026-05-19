@@ -27,7 +27,7 @@ const toolEntries = tools.map((tool) => ({
 }));
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-04-23T00:00:00.000Z");
+  const lastModified = new Date("2026-05-19T00:00:00.000Z");
 
   return [...sitemapEntries, ...toolEntries].map((entry) => ({
     url: getCanonicalUrl(entry.path),

@@ -42,13 +42,18 @@ describe("Kubernetes export snapshots", () => {
         canShareReportSafely: exported.report.canShareReportSafely,
         privacy: exported.report.privacy,
         analysisMetadata: {
-          ...exported.report.analysisMetadata,
+          documentCount: exported.report.analysisMetadata.documentCount,
+          inputBytes: "<bytes>",
           parseMs: "<timing>",
           analyzeMs: "<timing>",
           totalMs: "<timing>",
         },
         parseResult: {
           ...exported.report.parseResult,
+          input: {
+            ...exported.report.parseResult.input,
+            sizeBytes: "<bytes>",
+          },
           documents: exported.report.parseResult.documents.map((document) => ({
             index: document.index,
             apiVersion: document.apiVersion,

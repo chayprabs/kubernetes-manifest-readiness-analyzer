@@ -1,9 +1,18 @@
 # Authos
 
-Authos is a browser-first developer tools site built on Next.js. The current
-live product is a Kubernetes Manifest Analyzer that reviews pasted or uploaded
-YAML for production-readiness, security, networking, API-version, and
-operations risks without requiring a backend roundtrip.
+> **Repository naming:** GitHub hosts this project as
+> `kubernetes-manifest-readiness-analyzer`; the npm package and product brand
+> are **Authos** (`package.json` → `"name": "authos"`). The repo name reflects
+> the launch tool; the codebase is the full Authos site.
+
+Authos is a browser-first developer tools site built on Next.js. Authos ships four live browser-first Kubernetes tools:
+
+- **Kubernetes Manifest Analyzer** — production-readiness review for rendered manifests
+- **Helm Values Checker** — risky `values.yaml` before chart render
+- **Kustomize Output Diff Reviewer** — compare rendered overlay output
+- **NetworkPolicy Reviewer** — traffic policy posture and allowlist risks
+
+All tools run locally without a backend roundtrip.
 
 The repository is intentionally structured as a multi-tool foundation rather
 than a one-off page. Tool metadata lives in a central registry, the catalog is
@@ -75,9 +84,12 @@ If you want production-like metadata locally, copy `.env.example` to
 |   |   |-- tool/               # Tool-specific UI components
 |   |   `-- ui/                 # Shared UI primitives
 |   |-- lib/
+|   |   |-- helm/               # Helm values checker pipeline
 |   |   |-- k8s/                # Analyzer pipeline, rules, exports, fixtures, tests
+|   |   |-- kustomize-diff/     # Kustomize output diff engine
+|   |   |-- netpol-review/      # NetworkPolicy reviewer rules
 |   |   |-- privacy/            # Shared redaction and secret-detection helpers
-|   |   |-- tools/              # Tool registry
+|   |   |-- tools/              # Tool registry and navigation
 |   |   `-- site.ts             # Site-wide metadata helpers and config
 |   `-- workers/                # Web Worker entrypoints
 |-- tests/
@@ -122,6 +134,11 @@ For the full maintenance guide, start with
 - [`docs/launch/kubernetes-analyzer-launch-checklist.md`](docs/launch/kubernetes-analyzer-launch-checklist.md)
   captures the release gate, QA checks, privacy checks, and rollback plan for
   the first tool launch.
+- [`docs/operations/project-decisions.md`](docs/operations/project-decisions.md)
+  records resolved deployment, naming, roadmap, and maintenance decisions.
+- [`docs/operations/deployment.md`](docs/operations/deployment.md) covers Vercel
+  import, `NEXT_PUBLIC_SITE_URL`, and post-deploy smoke checks for the full suite.
+- Product specs for each live tool live under `docs/product/`.
 
 ## Deployment Notes
 
@@ -136,8 +153,9 @@ For the full maintenance guide, start with
   fully in the browser.
 - Web Worker support is preferred for analysis responsiveness, but the analyzer
   falls back to main-thread execution when the worker cannot start.
-- The main public routes that should remain healthy are `/`, `/tools`,
-  `/tools/kubernetes-manifest-analyzer`, and `/privacy`.
+- The main public routes that should remain healthy are `/`, `/tools`, all four
+  live tool routes under `/tools/*`, and `/privacy`.
+- Full deployment steps: [`docs/operations/deployment.md`](docs/operations/deployment.md).
 - `typedRoutes` is enabled in `next.config.ts`, so route strings used in code
   should stay valid Next.js route literals.
 

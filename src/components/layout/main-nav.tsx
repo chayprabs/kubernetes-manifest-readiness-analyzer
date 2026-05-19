@@ -12,15 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { getToolById } from "@/lib/tools/registry";
+import { getPrimaryNavLinks } from "@/lib/tools/nav";
 
-const kubernetesAnalyzer = getToolById("kubernetes-manifest-analyzer");
-
-const navLinks = [
-  { href: "/tools", label: "Tools" },
-  { href: kubernetesAnalyzer.slug, label: kubernetesAnalyzer.shortName },
-  { href: "/privacy", label: "Privacy" },
-] as const;
+const navLinks = getPrimaryNavLinks();
 
 export function MainNav() {
   const pathname = usePathname();

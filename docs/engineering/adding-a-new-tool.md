@@ -17,10 +17,10 @@ That registry currently powers:
 - tool card metadata
 - tool lookup helpers
 
-The main nav is slightly different: it contains a manual shortcut for the first
-tool in `src/components/layout/main-nav.tsx`. A new tool will appear in the
-catalog automatically, but it will not get a top-level nav link unless you add
-one deliberately.
+The main nav is registry-driven through `getPrimaryNavLinks()` in
+`src/lib/tools/nav.ts`. A tool with `status: "Live"` appears in the catalog and
+the top navigation automatically. Roadmap-only tools stay in
+`src/lib/tools/roadmap.ts` until they ship.
 
 ## Step 1: Add The Tool To The Registry
 

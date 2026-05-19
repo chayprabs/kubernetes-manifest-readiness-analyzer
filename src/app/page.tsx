@@ -15,7 +15,7 @@ import {
 import { SectionHeading } from "@/components/ui/section-heading";
 import { homeMetadata, siteConfig } from "@/lib/site";
 
-const featuredTools = getFeaturedTools(3);
+const featuredTools = getFeaturedTools();
 const [primaryTool] = featuredTools;
 
 export const metadata: Metadata = homeMetadata;
@@ -29,13 +29,13 @@ export default function Home() {
             <Badge variant="info">Now live</Badge>
             <div className="space-y-4">
               <CardTitle className="max-w-3xl text-4xl sm:text-5xl">
-                Authos launches with a local Kubernetes manifest analyzer for
-                production-readiness reviews.
+                Authos ships a four-tool Kubernetes review suite for local
+                production-readiness workflows.
               </CardTitle>
               <CardDescription className="max-w-2xl text-lg">
-                Paste YAML, upload manifest files, and review probes,
-                resources, runtime hardening, selectors, and exposure risks
-                without a backend roundtrip, database, or account.
+                Analyze manifests, Helm values, Kustomize output, and
+                NetworkPolicies in the browser without a backend roundtrip,
+                database, or account.
               </CardDescription>
             </div>
           </CardHeader>
@@ -126,7 +126,7 @@ export default function Home() {
         <SectionHeading
           eyebrow="Featured tools"
           title="Current Authos tools"
-          description="The catalog is intentionally small at launch: one serious tool, clearly described roadmap placeholders, and no fake product sprawl."
+          description="Four live browser-first tools cover manifests, Helm values, overlay diffs, and NetworkPolicy review."
         />
         <div className="grid gap-6">
           {featuredTools.map((tool) => (

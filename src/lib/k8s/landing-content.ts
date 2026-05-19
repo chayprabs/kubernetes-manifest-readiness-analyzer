@@ -74,23 +74,4 @@ export const k8sAnalyzerFaqs = [
   },
 ] as const;
 
-export const k8sAnalyzerComingSoonTools = [
-  {
-    title: "Kubernetes Helm Values Checker",
-    description:
-      "Planned for reviewing risky or incomplete Helm values before chart rendering and release promotion.",
-    href: "/tools#coming-soon",
-  },
-  {
-    title: "Kustomize Output Diff Reviewer",
-    description:
-      "Planned for comparing rendered Kustomize output between overlays without claiming live cluster drift analysis.",
-    href: "/tools#coming-soon",
-  },
-  {
-    title: "NetworkPolicy Builder and Reviewer",
-    description:
-      "Planned for helping teams review allowlists carefully, with strong warnings around default-deny traffic breakage.",
-    href: "/tools#coming-soon",
-  },
-] as const;
+export { k8sAnalyzerComingSoonTools, getRoadmapTools } from "@/lib/tools/roadmap";

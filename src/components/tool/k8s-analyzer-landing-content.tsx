@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { CopyButton } from "@/components/tool/copy-button";
 import { K8sPrivacySection } from "@/components/tool/k8s-privacy-section";
 import { Badge } from "@/components/ui/badge";
@@ -14,10 +15,7 @@ import {
   k8sManifestExamples,
   type K8sManifestExample,
 } from "@/lib/k8s/examples";
-import {
-  k8sAnalyzerComingSoonTools,
-  k8sAnalyzerFaqs,
-} from "@/lib/k8s/landing-content";
+import { k8sAnalyzerFaqs } from "@/lib/k8s/landing-content";
 
 type K8sAnalyzerLandingContentProps = {
   onLoadExample: (example: K8sManifestExample) => void;
@@ -385,38 +383,38 @@ export function K8sAnalyzerLandingContent({
 
       <K8sPrivacySection />
 
-      <section className="space-y-4" aria-labelledby="coming-soon-tools">
+      <section className="space-y-4" aria-labelledby="related-authos-tools">
         <div className="space-y-2">
-          <Badge variant="secondary">Coming soon</Badge>
+          <Badge variant="secondary">Authos suite</Badge>
           <h2
-            id="coming-soon-tools"
+            id="related-authos-tools"
             className="text-foreground text-3xl font-semibold"
           >
-            Related Kubernetes tools on the roadmap
+            More Kubernetes review tools
           </h2>
           <p className="text-muted max-w-4xl text-sm leading-7">
-            These are planned follow-on tools, not live features. The links
-            below point to the tools catalog section that tracks what is coming
-            next.
+            Authos also ships Helm values review, Kustomize output diffing, and
+            NetworkPolicy review as separate live tools in the same browser-first
+            catalog.
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {k8sAnalyzerComingSoonTools.map((tool) => (
-            <Card key={tool.title}>
-              <CardHeader className="gap-3">
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline">Coming soon</Badge>
-                </div>
-                <CardTitle>{tool.title}</CardTitle>
-                <CardDescription>{tool.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline">
-                  <Link href={tool.href}>View on tools page</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link href={"/tools/helm-values-checker" as Route}>
+              Helm Values Checker
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={"/tools/kustomize-output-diff" as Route}>Kustomize Diff</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={"/tools/networkpolicy-reviewer" as Route}>
+              NetworkPolicy Review
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/tools">View full catalog</Link>
+          </Button>
         </div>
       </section>
 

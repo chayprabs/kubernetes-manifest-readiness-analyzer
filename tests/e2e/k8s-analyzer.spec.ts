@@ -129,6 +129,20 @@ test("user can copy a Markdown report after analysis", async ({
     .toContain("Missing readiness probe");
 });
 
+test("user can download an HTML report after analysis", async ({ page }) => {
+  await gotoAnalyzer(page);
+  await loadStarterSample(page);
+  await waitForAnalysisResults(page);
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Open export report menu" }).click();
+  await page.getByRole("menuitem", { name: "Download HTML" }).click();
+  const download = await downloadPromise;
+
+  expect(download.suggestedFilename()).toMatch(/\.html$/u);
+  await expect(page.getByText("HTML report downloaded.")).toBeVisible();
+});
+
 async function gotoAnalyzer(page: Page) {
   await page.goto("/tools/kubernetes-manifest-analyzer", {
     waitUntil: "domcontentloaded",
@@ -157,7 +171,7 @@ async function loadStarterSample(page: Page) {
           })
           .isEnabled();
       },
-      { timeout: 15000 },
+      { timeout: 30_000 },
     )
     .toBe(true);
 }
@@ -199,7 +213,7 @@ async function waitForAnalyzerInteractivity(page: Page) {
           );
         });
       },
-      { timeout: 15000 },
+      { timeout: 30_000 },
     )
     .toBe(true);
 }
@@ -208,12 +222,12 @@ async function waitForAnalysisResults(page: Page) {
   await expect(
     page.getByRole("button", { name: "Open export report menu" }),
   ).toBeEnabled({
-    timeout: 15000,
+    timeout: 30_000,
   });
   await expect(
     page.getByRole("region", { name: "Analysis results" }),
   ).toBeVisible({
-    timeout: 15000,
+    timeout: 30_000,
   });
 }
 

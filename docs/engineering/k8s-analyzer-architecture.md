@@ -235,6 +235,8 @@ typed report.
   cover it with rule tests and snapshot updates if user-visible output changes.
 - Prefer adding behavior to the typed pipeline instead of embedding analyzer
   logic directly in React components.
-- The active implementation is `K8sAnalyzerApp`. `manifest-analyzer-shell.tsx`
-  is an older unused shell and should not be treated as the source of truth for
-  current behavior.
+- The active implementation is `K8sAnalyzerApp` in
+  `src/components/tool/k8s-analyzer-app.tsx`.
+- Primary navigation for live tools is registry-driven via
+  `getPrimaryNavLinks()` in `src/lib/tools/nav.ts`.
+- Report exports support Markdown, JSON, CSV, and HTML (`buildK8sHtmlExport`).

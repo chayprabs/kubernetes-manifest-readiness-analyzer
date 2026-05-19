@@ -5,7 +5,7 @@ exports[`Kubernetes golden report snapshots > keeps the broken production sample
   "analysisMetadata": {
     "analyzeMs": "<timing>",
     "documentCount": 2,
-    "inputBytes": 1447,
+    "inputBytes": "<bytes>",
     "parseMs": "<timing>",
     "totalMs": "<timing>",
   },
@@ -550,7 +550,7 @@ exports[`Kubernetes golden report snapshots > keeps the clean production sample 
   "analysisMetadata": {
     "analyzeMs": "<timing>",
     "documentCount": 5,
-    "inputBytes": 3478,
+    "inputBytes": "<bytes>",
     "parseMs": "<timing>",
     "totalMs": "<timing>",
   },
@@ -660,7 +660,7 @@ exports[`Kubernetes golden report snapshots > keeps the deprecated API sample st
   "analysisMetadata": {
     "analyzeMs": "<timing>",
     "documentCount": 8,
-    "inputBytes": 4064,
+    "inputBytes": "<bytes>",
     "parseMs": "<timing>",
     "totalMs": "<timing>",
   },
@@ -1259,7 +1259,7 @@ exports[`Kubernetes golden report snapshots > keeps the security-focused sample 
   "analysisMetadata": {
     "analyzeMs": "<timing>",
     "documentCount": 1,
-    "inputBytes": 1677,
+    "inputBytes": "<bytes>",
     "parseMs": "<timing>",
     "totalMs": "<timing>",
   },

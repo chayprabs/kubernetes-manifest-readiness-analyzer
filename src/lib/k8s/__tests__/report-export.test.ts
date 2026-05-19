@@ -3,6 +3,7 @@ import { analyzeK8sManifests, sampleBrokenManifest } from "@/lib/k8s/analyzer";
 import { createFinding } from "@/lib/k8s/findings";
 import {
   buildK8sCsvFindingsExport,
+  buildK8sHtmlExport,
   buildK8sJsonExport,
   buildK8sJsonExportObject,
   buildK8sMarkdownExport,
@@ -288,6 +289,19 @@ describe("Kubernetes report exports", () => {
         `line two"`,
       ].join("\n"),
     );
+  });
+
+  it("builds a standalone HTML export document", () => {
+    const report = analyzeK8sManifests(sampleBrokenManifest, {
+      kubernetesTargetVersion: "1.34",
+    });
+    const html = buildK8sHtmlExport(report, {
+      generatedAt: fixedTimestamp,
+    });
+
+    expect(html).toMatch(/^<!doctype html>/iu);
+    expect(html).toContain("Kubernetes Manifest Review");
+    expect(html).toContain("Static manifest review only");
   });
 });
 

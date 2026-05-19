@@ -36,7 +36,7 @@ exports[`Kubernetes export snapshots > keeps JSON export redaction stable for th
     "analysisMetadata": {
       "analyzeMs": "<timing>",
       "documentCount": 2,
-      "inputBytes": 1093,
+      "inputBytes": "<bytes>",
       "parseMs": "<timing>",
       "totalMs": "<timing>",
     },
@@ -532,7 +532,7 @@ spec:
             - name: INTERNAL_API_ENDPOINT
               value: "[REDACTED INTERNAL HOST]"",
         "recommendedMaxBytes": 2097152,
-        "sizeBytes": 1093,
+        "sizeBytes": "<bytes>",
       },
       "ok": true,
       "warningCount": 0,

@@ -80,7 +80,7 @@ export const k8sAnalyzerProfiles: Record<
 export function getK8sAnalyzerProfile(
   profileId: K8sAnalyzerProfileId = "balanced",
 ) {
-  return k8sAnalyzerProfiles[profileId];
+  return k8sAnalyzerProfiles[profileId] ?? k8sAnalyzerProfiles.balanced;
 }
 
 export function resolveAnalyzerOptions(options: K8sAnalyzerOptions = {}) {

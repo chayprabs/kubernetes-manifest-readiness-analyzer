@@ -1,5 +1,5 @@
 import {
-  createAuthosSocialImage,
+  createK8sReadinessSocialImage,
   socialImageContentType,
   socialImageSize,
 } from "@/lib/seo/social-image";
@@ -10,7 +10,7 @@ export const size = socialImageSize;
 export const contentType = socialImageContentType;
 
 export default function TwitterImage() {
-  return createAuthosSocialImage({
+  return createK8sReadinessSocialImage({
     eyebrow: "Authos",
     title: "Kubernetes Manifest Analyzer",
     description:

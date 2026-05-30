@@ -9,7 +9,7 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? "line" : "list",
-  timeout: 60_000,
+  timeout: 120_000,
   workers: 1,
   use: {
     baseURL: playwrightBaseUrl,

@@ -1,38 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { K8sAnalyzerApp } from "@/components/tool/k8s-analyzer-app";
+import { HelmValuesApp } from "@/components/tool/helm-values-app";
+import { KustomizeDiffApp } from "@/components/tool/kustomize-diff-app";
+import { NetpolReviewApp } from "@/components/tool/netpol-review-app";
 import { toolRegistry } from "@/lib/tools/registry";
 import { cn } from "@/lib/utils";
-
-const K8sAnalyzerApp = dynamic(
-  () =>
-    import("@/components/tool/k8s-analyzer-app").then((m) => m.K8sAnalyzerApp),
-  { ssr: false, loading: () => <ToolLoading label="Manifest Analyzer" /> },
-);
-
-const HelmValuesApp = dynamic(
-  () =>
-    import("@/components/tool/helm-values-app").then((m) => m.HelmValuesApp),
-  { ssr: false, loading: () => <ToolLoading label="Helm Values Checker" /> },
-);
-
-const KustomizeDiffApp = dynamic(
-  () =>
-    import("@/components/tool/kustomize-diff-app").then(
-      (m) => m.KustomizeDiffApp,
-    ),
-  { ssr: false, loading: () => <ToolLoading label="Kustomize Diff" /> },
-);
-
-const NetpolReviewApp = dynamic(
-  () =>
-    import("@/components/tool/netpol-review-app").then(
-      (m) => m.NetpolReviewApp,
-    ),
-  { ssr: false, loading: () => <ToolLoading label="NetworkPolicy Reviewer" /> },
-);
 
 const TOOL_COMPONENTS = {
   "kubernetes-manifest-analyzer": K8sAnalyzerApp,
@@ -45,14 +20,6 @@ type ToolId = keyof typeof TOOL_COMPONENTS;
 
 function isToolId(value: string | null): value is ToolId {
   return value !== null && value in TOOL_COMPONENTS;
-}
-
-function ToolLoading({ label }: { label: string }) {
-  return (
-    <div className="text-muted flex min-h-[320px] items-center justify-center text-sm">
-      Loading {label}…
-    </div>
-  );
 }
 
 export function ToolSuite() {
@@ -77,7 +44,7 @@ export function ToolSuite() {
     [router, searchParams],
   );
 
-  const ActiveTool = useMemo(() => TOOL_COMPONENTS[activeId], [activeId]);
+  const ActiveTool = TOOL_COMPONENTS[activeId];
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-4 py-4 sm:px-6 sm:py-6">

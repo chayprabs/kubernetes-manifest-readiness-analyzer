@@ -1,6 +1,19 @@
 import Link from "next/link";
-import { Github, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import { siteConfig } from "@/lib/site";
+
+function GitHubIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.405-1.03-1.005-1.305-1.005-1.305-.825-.57.03-.555.03-.555.9.03 1.365 1.23 1.365 1.23.81 1.395 2.115.99 2.625.765.09-.6.315-.99.57-1.215-2.4-.27-4.92-1.2-4.92-5.355 0-1.185.42-2.145 1.125-2.895-.12-.27-.495-1.335.105-2.775 0 0 .93-.3 3.045 1.11.885-.24 1.83-.36 2.775-.36.945 0 1.89.12 2.775.36 2.115-1.425 3.045-1.11 3.045-1.11.6 1.44.225 2.505.105 2.775.705.75 1.125 1.71 1.125 2.895 0 4.17-2.52 5.085-4.92 5.355.39.33.735.945.735 1.92 0 1.385-.015 2.505-.015 2.85 0 .285.225.675.84.57A8.205 8.205 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+    </svg>
+  );
+}
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -38,7 +51,7 @@ export function AppTopbar() {
             rel="noopener noreferrer"
             className={externalLinkClass}
           >
-            <Github className="h-4 w-4" aria-hidden />
+            <GitHubIcon className="h-4 w-4" />
             <span className="hidden sm:inline">GitHub</span>
             <span className="sr-only sm:hidden">GitHub repository</span>
           </a>

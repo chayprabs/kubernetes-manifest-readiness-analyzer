@@ -1,5 +1,11 @@
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import {
+  gotoAnalyzer,
+  loadStarterSample,
+  manifestUploadInput,
+  waitForAnalysisResults,
+} from "./k8s-analyzer-helpers";
 
 const invalidYamlFixture = path.join(
   process.cwd(),
@@ -142,94 +148,6 @@ test("user can download an HTML report after analysis", async ({ page }) => {
   expect(download.suggestedFilename()).toMatch(/\.html$/u);
   await expect(page.getByText("HTML report downloaded.")).toBeVisible();
 });
-
-async function gotoAnalyzer(page: Page) {
-  await page.goto("/", {
-    waitUntil: "domcontentloaded",
-  });
-  await expect(
-    page.getByRole("heading", {
-      name: "Kubernetes Manifest Analyzer",
-    }),
-  ).toBeVisible();
-  await waitForAnalyzerInteractivity(page);
-}
-
-async function loadStarterSample(page: Page) {
-  await expect
-    .poll(
-      async () => {
-        await page
-          .getByRole("button", {
-            name: "Reset to the starter sample manifest",
-          })
-          .click();
-
-        return page
-          .getByRole("button", {
-            name: "Analyze the current Kubernetes manifest draft",
-          })
-          .isEnabled();
-      },
-      { timeout: 30_000 },
-    )
-    .toBe(true);
-}
-
-function manifestUploadInput(page: Page) {
-  return page.locator(
-    'input[type="file"][accept=".yaml,.yml,.json,.txt"]',
-  ).first();
-}
-
-async function waitForAnalyzerInteractivity(page: Page) {
-  await expect
-    .poll(
-      async () => {
-        await page
-          .getByRole("button", {
-            name: "Focus the Kubernetes manifest editor",
-          })
-          .click();
-
-        return page.evaluate(() => {
-          const activeElement = document.activeElement;
-
-          if (!activeElement) {
-            return false;
-          }
-
-          if (
-            activeElement.getAttribute("aria-label") ===
-            "Kubernetes manifest editor"
-          ) {
-            return true;
-          }
-
-          return (
-            activeElement.closest?.(
-              '[aria-label="Kubernetes manifest editor"]',
-            ) !== null
-          );
-        });
-      },
-      { timeout: 30_000 },
-    )
-    .toBe(true);
-}
-
-async function waitForAnalysisResults(page: Page) {
-  await expect(
-    page.getByRole("button", { name: "Open export report menu" }),
-  ).toBeEnabled({
-    timeout: 30_000,
-  });
-  await expect(
-    page.getByRole("region", { name: "Analysis results" }),
-  ).toBeVisible({
-    timeout: 30_000,
-  });
-}
 
 async function dropManifest(page: Page, manifest: string) {
   const dataTransfer = await page.evaluateHandle(({ manifestText, name }) => {

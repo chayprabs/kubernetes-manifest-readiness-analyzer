@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 
 export function MinimalFooter() {
   return (
@@ -11,7 +12,7 @@ export function MinimalFooter() {
           Privacy Policy
         </Link>
         <Link
-          href="/terms"
+          href={"/terms" as Route}
           className="text-muted hover:text-foreground transition"
         >
           Terms &amp; Conditions

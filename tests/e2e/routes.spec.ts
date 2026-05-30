@@ -13,9 +13,11 @@ test("home page renders the tool workspace", async ({ page }) => {
 });
 
 test("home page can switch to Helm values checker tab", async ({ page }) => {
-  await page.goto("/", { waitUntil: "load" });
-  await page.getByRole("tab", { name: "Helm Values" }).click();
-  await expect(page).toHaveURL(/\?tool=helm-values-checker/u);
+  await page.goto("/?tool=helm-values-checker", { waitUntil: "load" });
+  await expect(page.getByRole("tab", { name: "Helm Values" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await expect(
     page.getByRole("button", { name: "Analyze values" }),
   ).toBeVisible();

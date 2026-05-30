@@ -1,5 +1,5 @@
 import {
-  createAuthosSocialImage,
+  createK8sReadinessSocialImage,
   socialImageContentType,
   socialImageSize,
 } from "@/lib/seo/social-image";
@@ -10,7 +10,7 @@ export const size = socialImageSize;
 export const contentType = socialImageContentType;
 
 export default function OpenGraphImage() {
-  return createAuthosSocialImage({
+  return createK8sReadinessSocialImage({
     eyebrow: "Kubernetes Manifest Analyzer",
     title: "Production-readiness review for Kubernetes YAML",
     description:

@@ -58,144 +58,144 @@ describe("Kubernetes report exports", () => {
 
       ## Fix First
 
-      1. **Missing readiness probe** on \`Deployment/sample-demo (default)\`
-      2. **Deployment rollout availability risk** on \`Deployment/sample-demo (default)\`
-      3. **Missing liveness probe** on \`Deployment/sample-demo (default)\`
+      1. **Missing readiness probe** on \`Deployment/demo-demo (default)\`
+      2. **Deployment rollout availability risk** on \`Deployment/demo-demo (default)\`
+      3. **Missing liveness probe** on \`Deployment/demo-demo (default)\`
 
       ## Top Findings
 
       Showing 19 of 19 findings.
 
       1. **[HIGH] Missing readiness probe**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Container "api" in Deployment "sample-demo" does not define a readinessProbe.
+         - Finding: Container "api" in Deployment "demo-demo" does not define a readinessProbe.
          - Recommendation: Add a readinessProbe for this container. Use the template below as a starting point and adjust the path, port, and timing to match the application.
          - Suggested fix: Add a readiness probe template
 
       2. **[MEDIUM] Deployment rollout availability risk**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Deployment "sample-demo" rolls only 1 replica, so a rollout has no spare serving capacity if the replacement pod starts slowly or fails readiness.
+         - Finding: Deployment "demo-demo" rolls only 1 replica, so a rollout has no spare serving capacity if the replacement pod starts slowly or fails readiness.
          - Recommendation: Increase replicas to at least 2 and keep maxUnavailable at 0 for small Deployments that need to stay online during rollouts.
          - Suggested fix: Keep zero planned unavailability during rollout and add replica headroom.
 
       3. **[MEDIUM] Missing liveness probe**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Container "api" in Deployment "sample-demo" does not define a livenessProbe.
+         - Finding: Container "api" in Deployment "demo-demo" does not define a livenessProbe.
          - Recommendation: Add a livenessProbe that reflects real stuck-process behavior. Use the template below as a starting point and adjust the path, port, and timing to match the application.
          - Suggested fix: Add a liveness probe template
 
       4. **[MEDIUM] Missing resource limits**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Container "api" in Deployment "sample-demo" is missing both memory and CPU limits.
+         - Finding: Container "api" in Deployment "demo-demo" is missing both memory and CPU limits.
          - Recommendation: Add a memory limit and decide explicitly whether a CPU limit is appropriate for this workload. The example below is only a placeholder and must be tuned.
          - Suggested fix: Add resource requests and limits
 
       5. **[MEDIUM] Missing resource requests**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Container "api" in Deployment "sample-demo" is missing cpu and memory requests.
+         - Finding: Container "api" in Deployment "demo-demo" is missing cpu and memory requests.
          - Recommendation: Set CPU and memory requests for this container using measured usage as a starting point. The example below is a placeholder, not a universal production value.
          - Suggested fix: Add resource requests and limits
 
       6. **[MEDIUM] Mutable image tag**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Container "api" in Deployment "sample-demo" uses image "ghcr.io/sample/demo:latest" with the mutable ":latest" tag.
+         - Finding: Container "api" in Deployment "demo-demo" uses image "ghcr.io/demo/demo:latest" with the mutable ":latest" tag.
          - Recommendation: Pin the image to an explicit version tag or, better, an image digest so deployments stay reproducible.
          - Suggested fix: Pin the image to an immutable tag or digest
 
       7. **[MEDIUM] Missing seccomp profile**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not set a seccomp profile.
+         - Finding: Container "api" in Deployment "demo-demo" does not set a seccomp profile.
          - Recommendation: Set seccompProfile.type: RuntimeDefault unless the app has a reviewed need for a custom profile.
          - Suggested fix: Add a reviewed securityContext baseline
 
       8. **[MEDIUM] runAsNonRoot should be true**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not set runAsNonRoot: true at the pod or container level.
+         - Finding: Container "api" in Deployment "demo-demo" does not set runAsNonRoot: true at the pod or container level.
          - Recommendation: Set runAsNonRoot: true at pod level when possible so every container inherits the safer default.
          - Suggested fix: Add a reviewed securityContext baseline
 
       9. **[MEDIUM] Missing recommended app labels**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: best-practice
-         - Finding: Deployment "sample-demo" is missing recommended app labels: app.kubernetes.io/name, app.kubernetes.io/instance, app.kubernetes.io/component, app.kubernetes.io/part-of, app.kubernetes.io/managed-by.
+         - Finding: Deployment "demo-demo" is missing recommended app labels: app.kubernetes.io/name, app.kubernetes.io/instance, app.kubernetes.io/component, app.kubernetes.io/part-of, app.kubernetes.io/managed-by.
          - Recommendation: Add the standard app.kubernetes.io labels with values that reflect the app name, instance, component, broader system, and deployment manager.
          - Suggested fix: Add the recommended app.kubernetes.io labels with real values for this resource.
 
       10. **[LOW] Single replica Deployment**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: reliability
-         - Finding: Deployment "sample-demo" is configured with 1 replica.
+         - Finding: Deployment "demo-demo" is configured with 1 replica.
          - Recommendation: Set this Deployment to at least 2 replicas for production-style availability, then confirm the workload and dependencies can support the extra copies.
          - Suggested fix: Scale the Deployment to 2 replicas
 
       11. **[LOW] allowPrivilegeEscalation should be false**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not set allowPrivilegeEscalation: false.
+         - Finding: Container "api" in Deployment "demo-demo" does not set allowPrivilegeEscalation: false.
          - Recommendation: Set allowPrivilegeEscalation: false unless the application has a reviewed need for it.
          - Suggested fix: Add a reviewed securityContext baseline
 
       12. **[LOW] automountServiceAccountToken should usually be false**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Deployment "sample-demo" does not set automountServiceAccountToken: false.
+         - Finding: Deployment "demo-demo" does not set automountServiceAccountToken: false.
          - Recommendation: Set automountServiceAccountToken: false unless the workload has a reviewed reason to call the Kubernetes API.
          - Suggested fix: Disable automatic service account token mounting for app workloads that do not need cluster API access.
 
       13. **[LOW] Capabilities should drop ALL by default**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not drop all capabilities before adding exceptions.
+         - Finding: Container "api" in Deployment "demo-demo" does not drop all capabilities before adding exceptions.
          - Recommendation: Start from capabilities.drop: ["ALL"] and then add back only the minimum reviewed capabilities if the app truly requires them.
          - Suggested fix: Add a reviewed securityContext baseline
 
       14. **[LOW] Container may run as root by default**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not set runAsNonRoot or runAsUser, so the image could still start as root by default.
+         - Finding: Container "api" in Deployment "demo-demo" does not set runAsNonRoot or runAsUser, so the image could still start as root by default.
          - Recommendation: Set runAsNonRoot: true explicitly and, when needed, choose a reviewed non-zero UID for the container.
          - Suggested fix: Add a reviewed securityContext baseline
 
       15. **[LOW] Production workload uses the default ServiceAccount**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Deployment "sample-demo" uses the default ServiceAccount with its token mount still enabled.
+         - Finding: Deployment "demo-demo" uses the default ServiceAccount with its token mount still enabled.
          - Recommendation: Use a dedicated ServiceAccount for workloads that need cluster API access, and disable token mounting when they do not.
          - Suggested fix: Move the workload off the default ServiceAccount and disable token mounting if the API is unnecessary.
 
       16. **[LOW] readOnlyRootFilesystem should be true**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: security
-         - Finding: Container "api" in Deployment "sample-demo" does not set readOnlyRootFilesystem: true.
+         - Finding: Container "api" in Deployment "demo-demo" does not set readOnlyRootFilesystem: true.
          - Recommendation: Set readOnlyRootFilesystem: true if the app can run from mounted writable paths such as emptyDir, PVCs, or dedicated cache directories.
          - Suggested fix: Add a reviewed securityContext baseline
 
       17. **[LOW] Namespace has no NetworkPolicy**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: networking
          - Finding: Namespace "default" has application workloads but no NetworkPolicy resources in the manifest set.
          - Recommendation: Add at least a reviewed baseline NetworkPolicy for this namespace. A default-deny policy is a careful rollout item that usually needs explicit allow rules alongside it.
          - Suggested fix: Start with a minimal default-deny policy and stage explicit allow rules carefully.
 
       18. **[LOW] Missing owner or team metadata**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: operations
-         - Finding: Deployment "sample-demo" does not include obvious owner or team labels/annotations.
+         - Finding: Deployment "demo-demo" does not include obvious owner or team labels/annotations.
          - Recommendation: Add a team label and owner annotation that match how your organization routes operational responsibility.
          - Suggested fix: Attach simple owner/team metadata so responders can find the responsible team quickly.
 
       19. **[LOW] Namespaced resource omits metadata.namespace**
-         - Resource: \`Deployment/sample-demo (default)\`
+         - Resource: \`Deployment/demo-demo (default)\`
          - Category: operations
-         - Finding: Deployment "sample-demo" does not set metadata.namespace and will rely on the default namespace at apply time.
+         - Finding: Deployment "demo-demo" does not set metadata.namespace and will rely on the default namespace at apply time.
          - Recommendation: Set metadata.namespace explicitly for namespaced resources so the manifest states its intended destination clearly.
          - Suggested fix: Add an explicit namespace instead of relying on the kubectl default.
 
@@ -285,7 +285,7 @@ describe("Kubernetes report exports", () => {
     expect(buildK8sCsvFindingsExport(csvReport)).toBe(
       [
         `"severity","category","resource","title","recommendation"`,
-        `"medium","operations","Deployment/sample-demo (default)","Comma, newline title","Line one,`,
+        `"medium","operations","Deployment/demo-demo (default)","Comma, newline title","Line one,`,
         `line two"`,
       ].join("\n"),
     );

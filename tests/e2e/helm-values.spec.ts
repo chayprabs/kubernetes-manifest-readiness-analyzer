@@ -3,13 +3,11 @@ import { expect, test } from "@playwright/test";
 test("helm values checker loads sample and produces findings", async ({
   page,
 }) => {
-  await page.goto("/tools/helm-values-checker", {
+  await page.goto("/?tool=helm-values-checker", {
     waitUntil: "load",
   });
 
-  await expect(
-    page.getByRole("heading", { name: "Kubernetes Helm Values Checker" }),
-  ).toBeVisible();
+  await page.getByRole("tab", { name: "Helm Values" }).click();
 
   const loadSample = page.getByRole("button", { name: "Risky chart values" });
   await expect(loadSample).toBeEnabled();

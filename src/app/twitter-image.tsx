@@ -1,16 +1,16 @@
 import {
-  createK8s ReadinessSocialImage,
+  createK8sReadinessSocialImage,
   socialImageContentType,
   socialImageSize,
 } from "@/lib/seo/social-image";
 
 export const alt =
-  "K8s Readiness social card promoting the local Kubernetes Manifest Analyzer.";
+  "Authos social card promoting the local Kubernetes Manifest Analyzer.";
 export const size = socialImageSize;
 export const contentType = socialImageContentType;
 
 export default function TwitterImage() {
-  return createK8s ReadinessSocialImage({
+  return createK8sReadinessSocialImage({
     eyebrow: "Launch product",
     title: "Kubernetes Manifest Analyzer",
     description:

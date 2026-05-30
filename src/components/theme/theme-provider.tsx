@@ -18,7 +18,7 @@ type ThemeContextValue = {
   setTheme: (theme: Theme) => void;
 };
 
-const STORAGE_KEY = "authos-theme";
+const STORAGE_KEY = "k8s-readiness-theme";
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 

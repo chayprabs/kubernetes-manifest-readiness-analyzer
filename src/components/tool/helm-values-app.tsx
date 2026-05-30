@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-export function HelmValuesApp() {
+export function HelmValuesApp({ embedded = false }: { embedded?: boolean }) {
   const [input, setInput] = useState("");
   const [profile, setProfile] = useState<HelmProfileId>("balanced");
   const [report, setReport] = useState<HelmAnalysisReport | null>(null);
@@ -47,8 +47,7 @@ export function HelmValuesApp() {
       profile,
       browserLocale: getAnalyticsBrowserLocale(),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only
-  }, []);
+  }, [profile]);
 
   const findings = useMemo(
     () =>
@@ -129,8 +128,11 @@ export function HelmValuesApp() {
     ];
   }, [report]);
 
+  const parseFailed = report !== null && !report.parseResult.ok;
+
   return (
     <ToolWorkspaceShell
+      embedded={embedded}
       title="Kubernetes Helm Values Checker"
       description="Review Helm values.yaml locally for risky image tags, missing resources, plaintext secrets, and insecure security context defaults before you render charts."
     >
@@ -210,7 +212,15 @@ export function HelmValuesApp() {
           </CardContent>
         </Card>
 
-        <GenericToolFindings findings={findings} />
+        <GenericToolFindings
+          findings={findings}
+          emptyMessage={
+            parseFailed
+              ? (report?.summary ??
+                "Fix YAML parse errors in values.yaml before reviewing findings.")
+              : undefined
+          }
+        />
       </div>
     </ToolWorkspaceShell>
   );

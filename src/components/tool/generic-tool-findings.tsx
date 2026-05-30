@@ -18,7 +18,7 @@ type GenericFinding = {
 
 type GenericToolFindingsProps = {
   findings: GenericFinding[];
-  emptyMessage?: string;
+  emptyMessage?: string | undefined;
 };
 
 export function GenericToolFindings({

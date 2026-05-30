@@ -75,9 +75,12 @@ export function NetpolReviewApp({ embedded = false }: { embedded?: boolean }) {
     });
   }
 
+  const parseFailed = report !== null && !report.ok && report.findings.length === 0;
+
   return (
     <ToolWorkspaceShell
-      title="NetworkPolicy Builder and Reviewer"
+      embedded={embedded}
+      title="NetworkPolicy Reviewer"
       description="Review NetworkPolicy YAML locally for risky allowlists, open egress, and missing default-deny posture before you apply traffic rules."
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -148,7 +151,15 @@ export function NetpolReviewApp({ embedded = false }: { embedded?: boolean }) {
           </CardContent>
         </Card>
 
-        <GenericToolFindings findings={findings} />
+        <GenericToolFindings
+          findings={findings}
+          emptyMessage={
+            parseFailed
+              ? (report?.summary ??
+                "Fix YAML parse errors before reviewing policies.")
+              : undefined
+          }
+        />
       </div>
     </ToolWorkspaceShell>
   );

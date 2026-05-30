@@ -63,7 +63,6 @@ import {
 } from "@/lib/k8s/landing-content";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout/container";
-import { useTheme } from "@/components/theme/theme-provider";
 import { K8sAnalyzerLandingContent } from "@/components/tool/k8s-analyzer-landing-content";
 import { CopyButton } from "@/components/tool/copy-button";
 import { FileDropzone } from "@/components/tool/file-dropzone";
@@ -195,12 +194,10 @@ const defaultSettings: StoredAnalyzerSettings = {
   softWrap: true,
 };
 
-type K8sAnalyzerAppProps = {
-  embedded?: boolean;
-};
+type K8sAnalyzerAppProps = { embedded?: boolean };
 
 export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
-  const { resolvedTheme } = useTheme();
+  const resolvedTheme = "light" as const;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const manifestInputSectionRef = useRef<HTMLElement | null>(null);
   const monacoEditorRef = useRef<MonacoStandaloneEditor | null>(null);
@@ -217,22 +214,22 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
   const [editorMode, setEditorMode] = useState<
     "loading" | "monaco" | "fallback"
   >("loading");
+  const initialSettings = useMemo(() => readStoredSettings(), []);
   const [yamlInput, setYamlInput] = useState("");
   const [selectedVersion, setSelectedVersion] = useState(
-    defaultSettings.kubernetesTargetVersion,
+    initialSettings.kubernetesTargetVersion,
   );
   const [selectedProfile, setSelectedProfile] = useState<K8sAnalyzerProfileId>(
-    defaultSettings.profile,
+    initialSettings.profile,
   );
   const [namespaceFilter, setNamespaceFilter] = useState(
-    defaultSettings.namespaceFilter,
+    initialSettings.namespaceFilter,
   );
-  const [autoAnalyze, setAutoAnalyze] = useState(defaultSettings.autoAnalyze);
-  const [softWrap, setSoftWrap] = useState(defaultSettings.softWrap);
+  const [autoAnalyze, setAutoAnalyze] = useState(initialSettings.autoAnalyze);
+  const [softWrap, setSoftWrap] = useState(initialSettings.softWrap);
   const [rememberSettings, setRememberSettings] = useState(
-    defaultSettings.rememberSettings,
+    initialSettings.rememberSettings,
   );
-  const [settingsHydrated, setSettingsHydrated] = useState(false);
   const [redactVisibleOutput, setRedactVisibleOutput] = useState(true);
   const [sourceLabel, setSourceLabel] = useState("New draft");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFileMeta[]>([]);
@@ -414,20 +411,7 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
   );
 
   useEffect(() => {
-    const stored = readStoredSettings();
-    if (stored.rememberSettings) {
-      setRememberSettings(true);
-      setSelectedVersion(stored.kubernetesTargetVersion);
-      setSelectedProfile(stored.profile);
-      setNamespaceFilter(stored.namespaceFilter);
-      setAutoAnalyze(stored.autoAnalyze);
-      setSoftWrap(stored.softWrap);
-    }
-    setSettingsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!settingsHydrated || typeof window === "undefined") {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -452,7 +436,6 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
     rememberSettings,
     selectedProfile,
     selectedVersion,
-    settingsHydrated,
     softWrap,
   ]);
 
@@ -470,14 +453,16 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
       "tool_viewed",
       createK8sAnalyticsPayloadInput({
         toolId: kubernetesManifestAnalyzerToolId,
-        profile: selectedProfile,
-        kubernetesVersion: selectedVersion,
+        profile: initialSettings.profile,
+        kubernetesVersion: initialSettings.kubernetesTargetVersion,
         browserLocale,
       }),
     );
-  });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only
-  }, []);
+  }, [
+    browserLocale,
+    initialSettings.kubernetesTargetVersion,
+    initialSettings.profile,
+  ]);
 
   useEffect(() => {
     if (
@@ -994,10 +979,7 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
 
   return (
     <div className={embedded ? "space-y-4" : "space-y-10"}>
-      <Container
-        size={embedded ? "page" : "workspace"}
-        className="space-y-6"
-      >
+      <Container size={embedded ? "page" : "workspace"} className="space-y-6">
         {!embedded ? (
         <Card>
           <CardContent className="grid gap-8 p-6 lg:grid-cols-[1.15fr_0.85fr] lg:p-8">
@@ -1568,13 +1550,13 @@ export function K8sAnalyzerApp({ embedded = false }: K8sAnalyzerAppProps) {
 
         {!embedded ? (
           <K8sAnalyzerLandingContent
-            onLoadExample={(example) =>
-              requestLoadExample(example, {
-                scrollToEditor: true,
-                focusEditor: true,
-              })
-            }
-          />
+          onLoadExample={(example) =>
+            requestLoadExample(example, {
+              scrollToEditor: true,
+              focusEditor: true,
+            })
+          }
+        />
         ) : null}
       </Container>
 

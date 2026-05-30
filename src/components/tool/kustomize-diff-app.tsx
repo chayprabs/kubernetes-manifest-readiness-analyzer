@@ -45,7 +45,7 @@ spec:
 
 const rightSample = leftSample.replace("1.0.0", "1.1.0");
 
-export function KustomizeDiffApp() {
+export function KustomizeDiffApp({ embedded = false }: { embedded?: boolean }) {
   const [leftInput, setLeftInput] = useState("");
   const [rightInput, setRightInput] = useState("");
   const [report, setReport] = useState<KustomizeDiffReport | null>(null);
@@ -183,7 +183,11 @@ export function KustomizeDiffApp() {
 
         <GenericToolFindings
           findings={findings}
-          emptyMessage="Run a comparison to review added, removed, and changed resources."
+          emptyMessage={
+            parseFailed
+              ? (report?.summary ?? "Fix YAML parse errors before comparing.")
+              : "Run a comparison to review added, removed, and changed resources."
+          }
         />
       </div>
     </ToolWorkspaceShell>

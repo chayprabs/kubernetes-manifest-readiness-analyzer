@@ -144,7 +144,7 @@ test("user can download an HTML report after analysis", async ({ page }) => {
 });
 
 async function gotoAnalyzer(page: Page) {
-  await page.goto("/tools/kubernetes-manifest-analyzer", {
+  await page.goto("/", {
     waitUntil: "domcontentloaded",
   });
   await expect(

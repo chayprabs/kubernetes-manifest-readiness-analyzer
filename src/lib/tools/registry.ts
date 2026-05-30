@@ -71,7 +71,7 @@ export const toolRegistry: ToolDefinition[] = [
     tags: ["Helm", "values.yaml", "Kubernetes", "DevOps", "chart review"],
     audiences: ["Platform engineers", "Release engineers", "SRE teams"],
     status: "Live",
-    seoTitle: "Helm Values Checker - Review values.yaml Locally | Authos",
+    seoTitle: "Helm Values Checker - Review values.yaml Locally | K8s Readiness",
     seoDescription:
       "Review Helm values.yaml for mutable image tags, missing resources, plaintext secrets, and insecure defaults before release.",
     relatedToolIds: [

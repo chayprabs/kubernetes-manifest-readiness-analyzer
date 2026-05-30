@@ -9,7 +9,7 @@ Values were verified against the codebase and public GitHub metadata on **2026-0
 | --- | --- |
 | Is production deployed? | **Not yet** (as of GitHub API check on 2026-04-23). |
 | Evidence | `homepage: null`, `has_pages: false` on [chayprabs/kubernetes-manifest-readiness-analyzer](https://github.com/chayprabs/kubernetes-manifest-readiness-analyzer). |
-| Runtime fallback | `https://authos.example` when `NEXT_PUBLIC_SITE_URL` is unset (`src/lib/site.ts`). |
+| Runtime fallback | `https://k8s-readiness.example` when `NEXT_PUBLIC_SITE_URL` is unset (`src/lib/site.ts`). |
 | Recommended first production value | `https://kubernetes-manifest-readiness-analyzer.vercel.app` (Vercel default for this repo name). Alternate: GitHub Pages URL in `src/lib/deployment.ts`. |
 
 Set `NEXT_PUBLIC_SITE_URL` in the host dashboard after the first deploy. Copy `.env.example` to `.env.local` for local dev.
@@ -33,13 +33,13 @@ Set `NEXT_PUBLIC_SITE_URL` in the host dashboard after the first deploy. Copy `.
 | Name | Role |
 | --- | --- |
 | `kubernetes-manifest-readiness-analyzer` | GitHub repository / clone folder name. |
-| `authos` | npm package name and product brand (`package.json`). |
+| `k8s-readiness` | npm package name and product brand (`package.json`). |
 
-**Source of truth:** the product is **Authos** (multi-tool site). The repo name reflects the launch tool and SEO; they do not need to match.
+**Source of truth:** the product is **K8s Readiness** (multi-tool site). The repo name reflects the launch tool and SEO; they do not need to match.
 
 ## Roadmap tool priority
 
-All three follow-on tools shipped live in Authos **1.0.0**. The roadmap module
+All three follow-on tools shipped live in K8s Readiness **1.0.0**. The roadmap module
 (`src/lib/tools/roadmap.ts`) is intentionally empty; new concepts should register
 in `src/lib/tools/registry.ts` when routes exist.
 

@@ -6,10 +6,10 @@ describe("parseK8sYaml", () => {
     const result = parseK8sYaml(`apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authos-api
+  name: sample-api
   namespace: platform
   labels:
-    app: authos
+    app: demo
 spec:
   replicas: 2`);
 
@@ -21,10 +21,10 @@ spec:
       apiVersion: "apps/v1",
       kind: "Deployment",
       metadata: {
-        name: "authos-api",
+        name: "sample-api",
         namespace: "platform",
         labels: {
-          app: "authos",
+          app: "demo",
         },
       },
       spec: {
@@ -38,12 +38,12 @@ spec:
     const result = parseK8sYaml(`apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authos-api
+  name: sample-api
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: authos-api
+  name: sample-api
   namespace: platform`);
 
     expect(result.ok).toBe(true);
@@ -134,7 +134,7 @@ kind: Deployment
 metadata:
   name: anchored-labels
   labels: &sharedLabels
-    app: authos
+    app: demo
     tier: api
 spec:
   template:
@@ -144,14 +144,14 @@ spec:
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
     expect(result.documents[0]?.metadata.labels).toEqual({
-      app: "authos",
+      app: "demo",
       tier: "api",
     });
     expect(result.documents[0]?.raw.spec).toMatchObject({
       template: {
         metadata: {
           labels: {
-            app: "authos",
+            app: "demo",
             tier: "api",
           },
         },

@@ -101,7 +101,7 @@ spec:
     spec:
       containers:
         - name: demo
-          image: ghcr.io/authos/demo:1.0.0`,
+          image: ghcr.io/sample/demo:1.0.0`,
       { rules },
     );
 

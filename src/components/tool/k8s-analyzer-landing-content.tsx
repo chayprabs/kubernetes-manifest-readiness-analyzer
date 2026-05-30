@@ -383,17 +383,17 @@ export function K8sAnalyzerLandingContent({
 
       <K8sPrivacySection />
 
-      <section className="space-y-4" aria-labelledby="related-authos-tools">
+      <section className="space-y-4" aria-labelledby="related-k8s-readiness-tools">
         <div className="space-y-2">
-          <Badge variant="secondary">Authos suite</Badge>
+          <Badge variant="secondary">K8s Readiness suite</Badge>
           <h2
-            id="related-authos-tools"
+            id="related-k8s-readiness-tools"
             className="text-foreground text-3xl font-semibold"
           >
             More Kubernetes review tools
           </h2>
           <p className="text-muted max-w-4xl text-sm leading-7">
-            Authos also ships Helm values review, Kustomize output diffing, and
+            K8s Readiness also ships Helm values review, Kustomize output diffing, and
             NetworkPolicy review as separate live tools in the same browser-first
             catalog.
           </p>

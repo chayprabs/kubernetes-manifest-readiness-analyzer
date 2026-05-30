@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const siteUrlPlaceholder = "https://authos.example";
+const siteUrlPlaceholder = "https://k8s-readiness.example";
 
 function normalizeBaseUrl(url: string) {
   return url.endsWith("/") ? url.slice(0, -1) : url;
@@ -11,12 +11,20 @@ function normalizeSitePath(path: string) {
 }
 
 export const siteConfig = {
-  name: "Authos",
-  shortTagline: "Browser-first developer tools",
+  name: "K8s Readiness",
+  shortTagline: "Browser-first Kubernetes review tools",
   mission:
-    "Browser-first tools that help engineering teams review risky changes before they ship.",
+    "Review Kubernetes manifests, Helm values, overlay diffs, and NetworkPolicies locally before you ship.",
   description:
-    "Authos builds browser-first developer tools for practical engineering workflows, starting with local Kubernetes manifest analysis and remediation guidance.",
+    "K8s Readiness is a browser-first suite for Kubernetes production-readiness checks. Analyze YAML locally with no backend upload.",
+  githubUrl:
+    "https://github.com/chayprabs/kubernetes-manifest-readiness-analyzer",
+  twitterUrl: "https://x.com/chayprabs",
+  websiteUrl: "https://www.chaitanyaprabuddha.com",
+  seoStripLine1:
+    "Analyze Kubernetes manifests, Helm values, Kustomize output, and NetworkPolicies in your browser.",
+  seoStripLine2:
+    "No account, no cluster connection, and no upload of your YAML to a server.",
   baseUrl: normalizeBaseUrl(
     process.env.NEXT_PUBLIC_SITE_URL ?? siteUrlPlaceholder,
   ),
@@ -72,22 +80,21 @@ export function createPageMetadata({
 }
 
 export const homeMetadata: Metadata = createPageMetadata({
-  title: "Authos | Browser-first developer tools",
-  description:
-    "Authos builds browser-first developer tools for infrastructure and application teams, starting with a local Kubernetes manifest analyzer and YAML checker.",
+  title: "K8s Readiness | Local Kubernetes review tools",
+  description: siteConfig.description,
   path: "/",
 });
 
-export const toolsMetadata: Metadata = createPageMetadata({
-  title: "Authos Tools",
+export const privacyMetadata: Metadata = createPageMetadata({
+  title: "Privacy Policy | K8s Readiness",
   description:
-    "Explore the Authos tool catalog, including the local Kubernetes manifest analyzer and future browser-first utilities for engineering teams.",
-  path: "/tools",
+    "How K8s Readiness processes data locally in your browser, what may be stored on your device, and what is not collected by default.",
+  path: "/privacy",
 });
 
-export const privacyMetadata: Metadata = createPageMetadata({
-  title: "Authos Privacy",
+export const termsMetadata: Metadata = createPageMetadata({
+  title: "Terms of Use | K8s Readiness",
   description:
-    "Learn how Authos keeps Kubernetes manifest analysis local-first, excludes raw YAML from exports by default, and avoids sending manifest content to telemetry.",
-  path: "/privacy",
+    "Terms governing use of the K8s Readiness browser-based Kubernetes review tools.",
+  path: "/terms",
 });

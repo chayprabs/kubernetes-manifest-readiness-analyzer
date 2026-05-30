@@ -1,111 +1,72 @@
 import type { Metadata } from "next";
-import { Container } from "@/components/layout/container";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { privacyMetadata } from "@/lib/site";
+import Link from "next/link";
+import { AppShell } from "@/components/layout/app-shell";
+import { privacyMetadata, siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = privacyMetadata;
 
 export default function PrivacyPage() {
   return (
-    <Container size="prose" className="space-y-8">
-      <SectionHeading
-        eyebrow="Privacy"
-        title="Local browser processing is the default direction"
-        description="Authos is being built as a browser-first toolset, and the Kubernetes manifest analyzer is designed to keep sensitive review flows inside the browser by default."
-      />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>First-tool privacy stance</CardTitle>
-            <CardDescription>
-              The Kubernetes Manifest Production-Readiness Analyzer runs its
-              parsing, scoring, findings, and remediation guidance locally in
-              the browser. The current tool does not require a backend manifest
-              upload path to do its work.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Core product boundary</CardTitle>
-            <CardDescription>
-              This product does not require authentication, backend storage, or
-              third-party AI APIs for the Kubernetes analyzer. Optional
-              analytics stays off by default and only supports sanitized public
-              event payloads when explicitly configured.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
+    <AppShell showSeoStrip={false}>
+      <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <h1 className="text-foreground mb-2 text-3xl font-semibold">
+          Privacy Policy
+        </h1>
+        <p className="text-muted mb-8 text-sm">Last updated: May 30, 2026</p>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <Badge variant="info">Manifest handling</Badge>
-            <CardTitle>Raw YAML stays local</CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted text-sm leading-7">
-            Pasted YAML is held in browser memory for the current session. Raw
-            manifest content is not persisted to localStorage by default.
-          </CardContent>
-        </Card>
+        <div className="text-foreground space-y-6 text-sm leading-7">
+          <section>
+            <h2 className="mb-2 text-lg font-semibold">Local-first analysis</h2>
+            <p>
+              {siteConfig.name} runs parsing, scoring, and report generation in
+              your browser. We do not operate a backend that receives your pasted
+              or uploaded YAML for the core review tools.
+            </p>
+          </section>
 
-        <Card>
-          <CardHeader>
-            <Badge variant="info">Exports</Badge>
-            <CardTitle>Redacted by default</CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted text-sm leading-7">
-            Report exports exclude raw YAML by default. Visible JSON and raw
-            manifest sections stay redacted unless a user explicitly asks for a
-            less-redacted export and confirms the warning.
-          </CardContent>
-        </Card>
+          <section>
+            <h2 className="mb-2 text-lg font-semibold">What stays on your device</h2>
+            <p>
+              The Kubernetes Manifest Analyzer may store explicit analyzer
+              settings (profile, target version, auto-analyze preference) in
+              your browser&apos;s local storage when you opt in. Raw manifest
+              text is not written to local storage by default.
+            </p>
+          </section>
 
-        <Card>
-          <CardHeader>
-            <Badge variant="info">Telemetry</Badge>
-            <CardTitle>Safe analytics only, and off by default</CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted text-sm leading-7">
-            If analytics is enabled through public environment variables, it is
-            limited to timings, counts, selected options, and coarse error
-            categories. Raw YAML, resource names, namespaces, and finding text
-            stay out.
-          </CardContent>
-        </Card>
-      </div>
+          <section>
+            <h2 className="mb-2 text-lg font-semibold">Exports and sharing</h2>
+            <p>
+              Report exports are generated locally. Sensitive fields may be
+              redacted in the UI and in JSON exports when redaction is enabled.
+              You are responsible for reviewing exports before sharing them.
+            </p>
+          </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Practical guidance</CardTitle>
-          <CardDescription>
-            Local processing reduces exposure, but Kubernetes bundles can still
-            carry production secrets and internal topology details.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-muted grid gap-4 text-sm leading-7">
-          <p>
-            Exports and visible JSON are intentionally conservative, especially
-            around Secret `data`, Secret `stringData`, literal secret-looking
-            environment variables, sensitive annotations, and credential-like
-            tokens.
-          </p>
-          <p>
-            Teams should still avoid pasting production secrets when possible.
-            If you can review rendered output sections or already-redacted
-            manifests, that is the safer input path.
-          </p>
-        </CardContent>
-      </Card>
-    </Container>
+          <section>
+            <h2 className="mb-2 text-lg font-semibold">Analytics</h2>
+            <p>
+              Product analytics are disabled unless you configure optional public
+              environment variables documented in <code>.env.example</code>.
+              When enabled, events are sanitized and must not include raw YAML.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-2 text-lg font-semibold">No accounts</h2>
+            <p>
+              This site does not require sign-in, and we do not maintain user
+              accounts or server-side manifest databases for the review tools.
+            </p>
+          </section>
+        </div>
+
+        <p className="text-muted mt-10 text-sm">
+          <Link href="/" className="text-accent hover:underline">
+            ← Back to tools
+          </Link>
+        </p>
+      </article>
+    </AppShell>
   );
 }

@@ -1,27 +1,18 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
-import { SiteShell } from "@/components/layout/site-shell";
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { ThemeScript } from "@/components/theme/theme-script";
+import { Inter } from "next/font/google";
 import { siteConfig, siteMetadataBase } from "@/lib/site";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   metadataBase: siteMetadataBase,
   title: {
     default: siteConfig.name,
-    template: "%s | Authos",
+    template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
@@ -44,17 +35,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      data-scroll-behavior="smooth"
-      className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full`}
-    >
-      <body className="bg-background text-foreground min-h-full">
-        <ThemeScript />
-        <ThemeProvider>
-          <SiteShell>{children}</SiteShell>
-        </ThemeProvider>
+    <html lang="en" className={`${inter.variable} h-full`}>
+      <body className="bg-white text-foreground min-h-full font-sans antialiased">
+        {children}
       </body>
     </html>
   );

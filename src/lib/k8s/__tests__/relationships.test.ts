@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/api:1.0.0
+          image: ghcr.io/sample/api:1.0.0
 ---
 apiVersion: v1
 kind: Service
@@ -66,7 +66,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/api:1.0.0
+          image: ghcr.io/sample/api:1.0.0
 ---
 apiVersion: v1
 kind: Service
@@ -103,7 +103,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/api:1.0.0
+          image: ghcr.io/sample/api:1.0.0
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -148,7 +148,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/api:1.0.0
+          image: ghcr.io/sample/api:1.0.0
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -218,7 +218,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/authos/web:1.0.0`);
+          image: ghcr.io/sample/web:1.0.0`);
 
     expect(graph.issues).toEqual(
       expect.arrayContaining([
@@ -287,7 +287,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/api:1.0.0
+          image: ghcr.io/sample/api:1.0.0
 ---
 apiVersion: v1
 kind: Service

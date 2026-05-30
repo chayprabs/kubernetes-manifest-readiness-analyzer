@@ -18,4 +18,18 @@ describe("analyzeHelmValues", () => {
     const report = analyzeHelmValues("   ");
     expect(report.findings).toEqual([]);
   });
+
+  it("flags nested container image tags in arrays", () => {
+    const yaml = `
+containers:
+  - name: api
+    image: nginx:latest
+    securityContext:
+      privileged: true
+`;
+    const report = analyzeHelmValues(yaml, { profile: "strict" });
+    const ruleIds = report.findings.map((finding) => finding.ruleId);
+    expect(ruleIds).toContain("mutable-image-tag");
+    expect(ruleIds).toContain("privileged-container-values");
+  });
 });

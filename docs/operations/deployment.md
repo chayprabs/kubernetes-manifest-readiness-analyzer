@@ -1,6 +1,6 @@
 # Production deployment
 
-Authos **1.0.0** ships four live tools. Deploy as a static Next.js app (Vercel recommended).
+K8s Readiness **1.0.0** ships four live tools. Deploy as a static Next.js app (Vercel recommended).
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ Authos **1.0.0** ships four live tools. Deploy as a static Next.js app (Vercel r
 1. Import `chayprabs/kubernetes-manifest-readiness-analyzer`.
 2. Framework preset: **Next.js** (uses `vercel.json` install/build commands).
 3. Set environment variable:
-   - `NEXT_PUBLIC_SITE_URL` = your production origin (e.g. `https://authos.example.com`)
+   - `NEXT_PUBLIC_SITE_URL` = your production origin (e.g. `https://k8s-readiness.example.com`)
 4. Deploy. Post-deploy smoke:
    - `/`, `/tools`, `/privacy`
    - `/tools/kubernetes-manifest-analyzer`

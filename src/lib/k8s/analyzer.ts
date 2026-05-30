@@ -168,14 +168,14 @@ function now() {
 export const sampleProductionReadyManifest = `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authos-demo
+  name: demo-demo
   namespace: apps
   labels:
-    app.kubernetes.io/name: authos-demo
-    app.kubernetes.io/instance: authos-demo-prod
+    app.kubernetes.io/name: demo-demo
+    app.kubernetes.io/instance: demo-demo-prod
     app.kubernetes.io/component: api
-    app.kubernetes.io/part-of: authos
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/part-of: demo
+    app.kubernetes.io/managed-by: demo
     team: platform
   annotations:
     owner: platform
@@ -183,13 +183,13 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app.kubernetes.io/name: authos-demo
-      app.kubernetes.io/instance: authos-demo-prod
+      app.kubernetes.io/name: demo-demo
+      app.kubernetes.io/instance: demo-demo-prod
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: authos-demo
-        app.kubernetes.io/instance: authos-demo-prod
+        app.kubernetes.io/name: demo-demo
+        app.kubernetes.io/instance: demo-demo-prod
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -198,7 +198,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: ghcr.io/authos/demo:1.0.0
+          image: ghcr.io/demo/demo:1.0.0
           ports:
             - name: http
               containerPort: 8080
@@ -229,21 +229,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: authos-demo
+  name: demo-demo
   namespace: apps
   labels:
-    app.kubernetes.io/name: authos-demo
-    app.kubernetes.io/instance: authos-demo-prod
+    app.kubernetes.io/name: demo-demo
+    app.kubernetes.io/instance: demo-demo-prod
     app.kubernetes.io/component: api
-    app.kubernetes.io/part-of: authos
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/part-of: demo
+    app.kubernetes.io/managed-by: demo
     team: platform
   annotations:
     owner: platform
 spec:
   selector:
-    app.kubernetes.io/name: authos-demo
-    app.kubernetes.io/instance: authos-demo-prod
+    app.kubernetes.io/name: demo-demo
+    app.kubernetes.io/instance: demo-demo-prod
   ports:
     - name: http
       port: 80
@@ -252,19 +252,19 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: authos-demo-pdb
+  name: demo-demo-pdb
   namespace: apps
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: authos-demo
-      app.kubernetes.io/instance: authos-demo-prod
+      app.kubernetes.io/name: demo-demo
+      app.kubernetes.io/instance: demo-demo-prod
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: authos-demo-default-deny
+  name: demo-demo-default-deny
   namespace: apps
 spec:
   podSelector: {}
@@ -275,39 +275,39 @@ spec:
 export const sampleBrokenManifest = `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authos-demo
+  name: demo-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: authos-demo
+      app: demo-demo
   template:
     metadata:
       labels:
-        app: authos-demo
+        app: demo-demo
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/demo:latest
+          image: ghcr.io/demo/demo:latest
           ports:
             - containerPort: 8080`;
 
 export const sampleManifest = `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authos-demo
+  name: demo-demo
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: authos-demo
+      app: demo-demo
   template:
     metadata:
       labels:
-        app: authos-demo
+        app: demo-demo
     spec:
       containers:
         - name: api
-          image: ghcr.io/authos/demo:latest
+          image: ghcr.io/demo/demo:latest
           ports:
             - containerPort: 8080`;

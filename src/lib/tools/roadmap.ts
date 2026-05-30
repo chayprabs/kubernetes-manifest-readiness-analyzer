@@ -11,14 +11,14 @@ export type RoadmapTool = {
   status: RoadmapToolStatus;
 };
 
-/** Shipped tools live in the registry. Roadmap is empty at Authos 1.0. */
-export const authosRoadmapTools: readonly RoadmapTool[] = [] as const;
+/** Shipped tools live in the registry. Roadmap is empty at initial launch. */
+export const productRoadmapTools: readonly RoadmapTool[] = [] as const;
 
 export function getRoadmapTools() {
-  return [...authosRoadmapTools].sort(
+  return [...productRoadmapTools].sort(
     (left, right) => left.priority - right.priority,
   );
 }
 
 /** @deprecated Use `getRoadmapTools()` */
-export const k8sAnalyzerComingSoonTools = authosRoadmapTools;
+export const k8sAnalyzerComingSoonTools = productRoadmapTools;

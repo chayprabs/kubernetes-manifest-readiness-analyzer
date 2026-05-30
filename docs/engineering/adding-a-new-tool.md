@@ -2,7 +2,7 @@
 
 ## Goal
 
-Authos is meant to grow beyond the Kubernetes analyzer. This guide explains the
+K8s Readiness is meant to grow beyond the Kubernetes analyzer. This guide explains the
 minimum work required to add a second tool page cleanly through the existing
 registry and route structure.
 

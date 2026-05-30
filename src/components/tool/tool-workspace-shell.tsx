@@ -7,6 +7,7 @@ type ToolWorkspaceShellProps = {
   description: string;
   children: ReactNode;
   footer?: ReactNode;
+  embedded?: boolean;
 };
 
 export function ToolWorkspaceShell({
@@ -14,7 +15,18 @@ export function ToolWorkspaceShell({
   description,
   children,
   footer,
+  embedded = false,
 }: ToolWorkspaceShellProps) {
+  if (embedded) {
+    return (
+      <div className="space-y-4">
+        <LocalOnlyNotice />
+        {children}
+        {footer}
+      </div>
+    );
+  }
+
   return (
     <Container size="workspace" className="space-y-8 pb-12">
       <div className="space-y-3">

@@ -15,7 +15,7 @@ type CreateSocialImageOptions = {
   footer: string;
 };
 
-export function createAuthosSocialImage({
+export function createK8s ReadinessSocialImage({
   eyebrow,
   title,
   description,
@@ -68,7 +68,7 @@ export function createAuthosSocialImage({
                 color: "#8fb7ff",
               }}
             >
-              <span>Authos</span>
+              <span>K8s Readiness</span>
               <span style={{ color: "rgba(143, 183, 255, 0.6)" }}>|</span>
               <span>{eyebrow}</span>
             </div>

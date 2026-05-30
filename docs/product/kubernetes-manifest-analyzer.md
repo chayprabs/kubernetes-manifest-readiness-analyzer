@@ -2,7 +2,7 @@
 
 ## Summary
 
-The Kubernetes Manifest Analyzer is Authos's first live tool. It is a
+The Kubernetes Manifest Analyzer is K8s Readiness's first live tool. It is a
 browser-first review surface for engineers who want fast, local feedback on
 manifest quality before a deploy. It focuses on production-readiness concerns
 that are easy to miss in a syntax-only review: probes, resources, security
@@ -47,7 +47,7 @@ coverage.
 - Privacy inspection and redacted exports for Markdown, JSON, CSV, and HTML
 - Browser worker execution with main-thread fallback
 - Sample manifests and fixture-backed test coverage
-- Registry-driven site navigation for live Authos tools
+- Registry-driven site navigation for live K8s Readiness tools
 
 ## Known Limitations
 
@@ -72,7 +72,7 @@ These are realistic expansion directions, not promises or shipped features.
   more cross-resource checks
 - Continue improving fix suggestions so more findings include safer, more
   reviewable remediation templates
-- Expand the Authos catalog with related tools already referenced in the site:
+- Expand the K8s Readiness catalog with related tools already referenced in the site:
   Helm values review, Kustomize output diff review, and a NetworkPolicy review
   workflow
 - Consider a reusable analyzer core that could eventually power a non-browser

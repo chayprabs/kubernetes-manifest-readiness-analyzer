@@ -92,8 +92,11 @@ export function KustomizeDiffApp() {
     });
   }
 
+  const parseFailed = report !== null && !report.ok && report.parseErrors.length > 0;
+
   return (
     <ToolWorkspaceShell
+      embedded={embedded}
       title="Kustomize Output Diff Reviewer"
       description="Compare two rendered Kustomize manifest bundles locally. See added, removed, and changed resources before you promote an overlay."
     >

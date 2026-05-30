@@ -32,7 +32,7 @@ settings, and result rendering.
 
 - Raw YAML lives in React state as `yamlInput`.
 - Remembered settings live in `localStorage` under
-  `authos-k8s-analyzer-settings`.
+  `k8s-readiness-k8s-analyzer-settings`.
 - Raw YAML is not persisted to `localStorage`.
 - The component prefers worker-based analysis and falls back to direct
   in-browser execution if the worker cannot run.

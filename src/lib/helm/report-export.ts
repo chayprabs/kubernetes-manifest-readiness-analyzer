@@ -5,13 +5,27 @@ import { downloadTextFile as downloadK8sTextFile } from "@/lib/k8s/report-export
 import type { HelmAnalysisReport, HelmFinding } from "@/lib/helm/types";
 
 export function buildHelmJsonExport(report: HelmAnalysisReport) {
+  const { parseResult, ...safeReport } = report;
+  const exportReport =
+    report.privacy.sensitiveDataDetected || !report.canShareReportSafely
+      ? {
+          ...safeReport,
+          parseResult: {
+            ...parseResult,
+            root: undefined,
+          },
+        }
+      : report;
+
   return JSON.stringify(
     {
       exportMetadata: {
         generatedLocallyInBrowser: true,
         reviewType: "helm-values-review",
+        redactedValues:
+          report.privacy.sensitiveDataDetected || !report.canShareReportSafely,
       },
-      report,
+      report: exportReport,
     },
     null,
     2,

@@ -1,11 +1,11 @@
 {
-  "name": "authos",
+  "name": "k8s-readiness",
   "version": "1.0.0",
   "private": true,
   "engines": {
     "node": ">=20"
   },
-  "description": "Browser-first developer tools for production-grade engineering workflows.",
+  "description": "Browser-first Kubernetes review tools for manifests, Helm values, Kustomize diffs, and NetworkPolicies.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

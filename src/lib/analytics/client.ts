@@ -85,8 +85,8 @@ function getAnalyticsProvider() {
 }
 
 function resolveAnalyticsProvider(): AnalyticsProvider {
-  const providerName = process.env.NEXT_PUBLIC_AUTHOS_ANALYTICS_PROVIDER;
-  const endpoint = process.env.NEXT_PUBLIC_AUTHOS_ANALYTICS_ENDPOINT;
+  const providerName = process.env.NEXT_PUBLIC_ANALYTICS_PROVIDER;
+  const endpoint = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT;
 
   if (providerName === "custom-endpoint" && endpoint) {
     return createCustomEndpointProvider(endpoint);

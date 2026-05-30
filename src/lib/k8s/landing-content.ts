@@ -5,7 +5,7 @@ export const kubernetesManifestAnalyzerPath =
   "/tools/kubernetes-manifest-analyzer";
 
 export const kubernetesManifestAnalyzerTitle =
-  "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | Authos";
+  "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | K8s Readiness";
 
 export const kubernetesManifestAnalyzerMetaDescription =
   "Analyze Kubernetes YAML locally for probes, resource limits, security context, service selectors, exposure risks, and readiness gaps before production deploys.";

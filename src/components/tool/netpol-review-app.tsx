@@ -38,7 +38,7 @@ spec:
     - {}
 `;
 
-export function NetpolReviewApp() {
+export function NetpolReviewApp({ embedded = false }: { embedded?: boolean }) {
   const [input, setInput] = useState("");
   const [report, setReport] = useState<NetpolAnalysisReport | null>(null);
 

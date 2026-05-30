@@ -18,7 +18,12 @@ export function collectHelmValuePaths(
     return Object.entries(value as Record<string, unknown>).flatMap(
       ([key, entry]) => {
         const nextPath = prefix ? `${prefix}.${key}` : key;
-        if (entry !== null && typeof entry === "object" && !Array.isArray(entry)) {
+        if (Array.isArray(entry)) {
+          return entry.flatMap((item, index) =>
+            collectHelmValuePaths(item, `${nextPath}[${index}]`),
+          );
+        }
+        if (entry !== null && typeof entry === "object") {
           return collectHelmValuePaths(entry, nextPath);
         }
         return [{ path: nextPath, value: entry }];

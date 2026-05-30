@@ -26,9 +26,10 @@ export function compareKustomizeOutputs(
   }
 
   if (parseErrors.length > 0) {
+    const sides = parseErrors.map((entry) => entry.side).join(" and ");
     return {
       ok: false,
-      message: "Fix YAML parse errors on both sides before comparing overlays.",
+      message: `Fix YAML parse errors on the ${sides} overlay before comparing.`,
       summary: "Parse blockers prevent a reliable diff.",
       leftDocumentCount: leftParse.documents.length,
       rightDocumentCount: rightParse.documents.length,

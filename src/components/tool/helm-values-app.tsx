@@ -47,7 +47,8 @@ export function HelmValuesApp() {
       profile,
       browserLocale: getAnalyticsBrowserLocale(),
     });
-  }, [profile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only
+  }, []);
 
   const findings = useMemo(
     () =>

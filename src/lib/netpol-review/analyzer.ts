@@ -50,7 +50,10 @@ export function analyzeNetworkPolicies(raw: string): NetpolAnalysisReport {
   }, {});
 
   return {
-    ok: !findings.some((finding) => finding.severity === "critical"),
+    ok: !findings.some(
+      (finding) =>
+        finding.severity === "critical" || finding.severity === "high",
+    ),
     message:
       findings.length === 0
         ? "No NetworkPolicy review findings for this bundle."

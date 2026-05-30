@@ -9,7 +9,7 @@ export function SiteFooter() {
         className="text-muted flex flex-col gap-4 py-8 text-sm md:flex-row md:items-center md:justify-between"
       >
         <div className="max-w-2xl space-y-2">
-          <p className="text-foreground font-medium">Authos</p>
+          <p className="text-foreground font-medium">K8s Readiness</p>
           <p>
             Core tools are designed to run locally in your browser whenever
             possible.

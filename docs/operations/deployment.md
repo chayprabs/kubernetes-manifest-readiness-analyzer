@@ -36,8 +36,8 @@ Set the GitHub repository **homepage** to the production URL.
 
 Leave unset for no-op telemetry. To enable:
 
-- `NEXT_PUBLIC_AUTHOS_ANALYTICS_PROVIDER=custom-endpoint`
-- `NEXT_PUBLIC_AUTHOS_ANALYTICS_ENDPOINT=<reviewed HTTPS endpoint>`
+- `NEXT_PUBLIC_ANALYTICS_ANALYTICS_PROVIDER=custom-endpoint`
+- `NEXT_PUBLIC_ANALYTICS_ANALYTICS_ENDPOINT=<reviewed HTTPS endpoint>`
 
 See `.env.example` and `docs/operations/project-decisions.md`.
 

@@ -176,7 +176,7 @@ type StoredAnalyzerSettings = {
   softWrap: boolean;
 };
 
-const SETTINGS_STORAGE_KEY = "authos-k8s-analyzer-settings";
+const SETTINGS_STORAGE_KEY = "k8s-readiness-analyzer-settings";
 
 const profileOptions = [
   k8sAnalyzerProfiles.balanced,

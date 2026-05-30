@@ -1,7 +1,7 @@
 const themeScript = `
   (function () {
     try {
-      var key = "authos-theme";
+      var key = "k8s-readiness-theme";
       var root = document.documentElement;
       var stored = window.localStorage.getItem(key);
       var theme =

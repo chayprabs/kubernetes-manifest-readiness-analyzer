@@ -49,7 +49,7 @@ export const toolRegistry: ToolDefinition[] = [
     ],
     status: "Live",
     seoTitle:
-      "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | Authos",
+      "Kubernetes Manifest Analyzer - Production Readiness YAML Checker | K8s Readiness",
     seoDescription:
       "Analyze Kubernetes YAML locally for probes, resource limits, security context, service selectors, exposure risks, and readiness gaps before production deploys.",
     relatedToolIds: [
@@ -93,7 +93,7 @@ export const toolRegistry: ToolDefinition[] = [
     tags: ["Kustomize", "diff", "Kubernetes", "overlays", "GitOps"],
     audiences: ["Platform engineers", "GitOps teams", "SRE teams"],
     status: "Live",
-    seoTitle: "Kustomize Output Diff Reviewer | Authos",
+    seoTitle: "Kustomize Output Diff Reviewer | K8s Readiness",
     seoDescription:
       "Compare rendered Kustomize YAML output between overlays and review added, removed, and changed Kubernetes resources locally.",
     relatedToolIds: [
@@ -115,7 +115,7 @@ export const toolRegistry: ToolDefinition[] = [
     tags: ["NetworkPolicy", "Kubernetes", "security", "traffic policy"],
     audiences: ["Platform engineers", "Security engineers", "SRE teams"],
     status: "Live",
-    seoTitle: "NetworkPolicy Reviewer - Local YAML Review | Authos",
+    seoTitle: "NetworkPolicy Reviewer - Local YAML Review | K8s Readiness",
     seoDescription:
       "Review Kubernetes NetworkPolicy YAML locally for risky allowlists, open egress, and namespace posture gaps.",
     relatedToolIds: [

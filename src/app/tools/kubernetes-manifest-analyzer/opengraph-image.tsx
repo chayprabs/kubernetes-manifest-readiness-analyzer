@@ -5,7 +5,7 @@ import {
 } from "@/lib/seo/social-image";
 
 export const alt =
-  "Open Graph card for the Authos Kubernetes Manifest Analyzer.";
+  "Open Graph card for the K8s Readiness Kubernetes Manifest Analyzer.";
 export const size = socialImageSize;
 export const contentType = socialImageContentType;
 

@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: legacy-prod
     app.kubernetes.io/component: web
     app.kubernetes.io/part-of: legacy-suite
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: platform
   annotations:
     owner: platform
@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/instance: legacy-prod
     app.kubernetes.io/component: web
     app.kubernetes.io/part-of: legacy-suite
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: platform
   annotations:
     owner: platform
@@ -128,7 +128,7 @@ metadata:
   labels:
     app.kubernetes.io/name: nightly-legacy-sync
     app.kubernetes.io/part-of: legacy-suite
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: platform
   annotations:
     owner: platform

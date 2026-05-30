@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: payments-prod
     app.kubernetes.io/component: api
     app.kubernetes.io/part-of: payments
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: payments-platform
   annotations:
     owner: payments-platform
@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/instance: payments-prod
     app.kubernetes.io/component: api
     app.kubernetes.io/part-of: payments
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: payments-platform
   annotations:
     owner: payments-platform
@@ -103,7 +103,7 @@ metadata:
     app.kubernetes.io/instance: payments-prod
     app.kubernetes.io/component: api
     app.kubernetes.io/part-of: payments
-    app.kubernetes.io/managed-by: authos
+    app.kubernetes.io/managed-by: k8s-readiness
     team: payments-platform
   annotations:
     owner: payments-platform

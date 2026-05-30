@@ -49,7 +49,7 @@ in `src/lib/tools/registry.ts` when routes exist.
 | --- | --- |
 | Provisioned? | **No** — no endpoint in repo or GitHub metadata. |
 | Default behavior | Strict no-op (`src/lib/analytics/client.ts`). |
-| Enable | Set `NEXT_PUBLIC_AUTHOS_ANALYTICS_PROVIDER=custom-endpoint` and `NEXT_PUBLIC_AUTHOS_ANALYTICS_ENDPOINT` after security review. |
+| Enable | Set `NEXT_PUBLIC_ANALYTICS_ANALYTICS_PROVIDER=custom-endpoint` and `NEXT_PUBLIC_ANALYTICS_ANALYTICS_ENDPOINT` after security review. |
 
 ## Primary navigation
 
